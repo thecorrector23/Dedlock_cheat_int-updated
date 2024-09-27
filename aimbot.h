@@ -11,11 +11,11 @@ struct AimbotSettings {
     bool enabled = true;          
     bool targetLocked = false;      
     int lockedTargetIndex = -1;     
-    float fov = 30.0f;             
-    float smoothness = 1.6f;        
+    float fov = 12.0f;             
+    float smoothness = 1.0f;        
     bool active = false;            
-    int activationKey = VK_RBUTTON; 
-    float maxDistance = 2500.0f;   
+    int activationKey = VK_XBUTTON1;
+    float maxDistance = 3200.0f;   
     bool soulsAim = false;          
 };
 
@@ -39,4 +39,3 @@ namespace Aimbot {
 
     std::string GetKeyName(int key);
 }
-
