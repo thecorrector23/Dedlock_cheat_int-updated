@@ -6,10 +6,10 @@
 
 namespace offsets
 {
-    std::ptrdiff_t dwEntityList = 0x1f4a2d8;
-    std::ptrdiff_t dwLocalPlayer = 0x20f7158;
-    std::ptrdiff_t CCitadelCameraManager = 0x1f6bbe0;
-    std::ptrdiff_t dwViewMatrix = 0x2108e60;
+    std::ptrdiff_t dwEntityList = 0x1f4fb98;
+    std::ptrdiff_t dwLocalPlayer = 0x20fd718;
+    std::ptrdiff_t CCitadelCameraManager = 0x1f71b00;
+    std::ptrdiff_t dwViewMatrix = 0x210f420;
 
     void initializeOffsets()
     {
