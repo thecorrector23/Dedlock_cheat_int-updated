@@ -265,9 +265,8 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
             else {
 
                 enemyHeadPos = memory::memRead<Vector3>(targetEntity.entityAddress + offsets::m_vOldOrigin);
-                enemyHeadPos.Z += 92.0f;
+                enemyHeadPos.Z += 80.0f;
             }
-
 
             Vector3 screenPos = WorldToScreen(vm, enemyHeadPos);
 
@@ -297,10 +296,6 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
         settings.lockedTargetIndex = -1;
     }
 }
-
-
-
-
 
 
 Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix& vm, uintptr_t localEntity, uint8_t localTeam, int& closestIndex, float fov) {
@@ -335,7 +330,7 @@ Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix&
         else {
 
             entityHeadPos = memory::memRead<Vector3>(entity.entityAddress + offsets::m_vOldOrigin);
-            entityHeadPos.Z += 92.0f;
+            entityHeadPos.Z += 80.0f; //CHANGE THIS IF YOU WANT TO ADJUST THE AIMBOT Z POSITION (TOO LOW OR TOO HIGH)
         }
 
 
@@ -360,9 +355,6 @@ Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix&
 
     return closestEnemyPosition;
 }
-
-
-
 
 
 void Aimbot::RenderAimbotSettingsMenu() {
@@ -402,4 +394,3 @@ void Aimbot::RenderAimbotSettingsMenu() {
         ImGui::TreePop();
     }
 }
-
