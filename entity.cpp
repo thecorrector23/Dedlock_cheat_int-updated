@@ -24,7 +24,8 @@ static const std::unordered_map<std::string, std::string> model_to_name_map = {
     {"models/heroes_staging/viscous/viscous.vmdl", "VISCOUS"},
     {"models/heroes_staging/warden/warden.vmdl", "WARDEN"},
     {"models/heroes_staging/wraith_gen_man/wraith_gen_man.vmdl", "WRAITH"},
-    {"models/heroes_staging/yamato_v2/yamato.vmdl", "YAMATO"}
+    {"models/heroes_staging/yamato_v2/yamato.vmdl", "YAMATO"},
+    {"models/heroes_staging/mirage/mirage.vmdl", "MIRAGE"}
 };
 
 
@@ -50,6 +51,7 @@ static const std::unordered_map<std::string, int> model_to_head_bone_map = {
     {"WARDEN", 11},
     {"WRAITH", 7},
     {"YAMATO", 35},
+    {"MIRAGE", 8},
     {"models/heroes_staging/gen_man/gen_man.vmdl", 12}
 };
 
