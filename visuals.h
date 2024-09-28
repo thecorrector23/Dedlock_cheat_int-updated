@@ -19,7 +19,6 @@ struct EntityCache {
     int headBoneIndex = -1;   
 };
 
-
 namespace Visuals1 {
     extern std::vector<EntityCache> entityCache;  
     extern std::chrono::time_point<std::chrono::steady_clock> lastCacheUpdate;
@@ -41,5 +40,5 @@ namespace Visuals1 {
  
     void UpdateEntityCache();
     void PlayerEsp(uint8_t& local_team);
-    void RenderSettingsMenu();
+    //void RenderSettingsMenu();
 }
