@@ -299,10 +299,6 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
 }
 
 
-
-
-
-
 Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix& vm, uintptr_t localEntity, uint8_t localTeam, int& closestIndex, float fov) {
     float closestDistance = FLT_MAX;
     Vector3 closestEnemyPosition;
@@ -362,9 +358,6 @@ Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix&
 }
 
 
-
-
-
 void Aimbot::RenderAimbotSettingsMenu() {
     if (ImGui::Checkbox("Enable Aimbot", &settings.enabled)) {
         ImGui::SetNextItemOpen(false);
@@ -402,4 +395,3 @@ void Aimbot::RenderAimbotSettingsMenu() {
         ImGui::TreePop();
     }
 }
-
