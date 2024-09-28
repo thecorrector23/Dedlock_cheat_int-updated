@@ -1,6 +1,6 @@
 # I will continue to update the cheat and offsets almost every time a new update comes out
 
-THE GAME HAS AN ANTI CHEAT NOW (27/09), BE CAREFUL WHEN USING THIS, I AM NOT RESPONSIBLE IF YOU GET BANNED
+THE GAME HAS AN ANTI CHEAT NOW
 
 If your PC is not good enough you can increase the cacheUpdateInterval of the visuals (1000 to 10000)
 File visuals.ccp:44
