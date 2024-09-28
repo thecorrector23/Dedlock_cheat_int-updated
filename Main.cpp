@@ -89,7 +89,7 @@ void RenderMenu() {
     if (ImGui::BeginTabBar("##tabs")) {
    
         if (ImGui::BeginTabItem("Render")) {
-            Visuals1::RenderSettingsMenu();
+            //Visuals1::RenderSettingsMenu();
             ImGui::EndTabItem();
         }
 
@@ -161,7 +161,7 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
 
 
     /*
-    // Вывод ViewMatrix в ImGui
+    // Г‚Г»ГўГ®Г¤ ViewMatrix Гў ImGui
     ImGui::Text("ViewMatrix:");
     for (int i = 0; i < 4; ++i) {
         ImGui::Text("[%.2f, %.2f, %.2f, %.2f]",
@@ -260,20 +260,20 @@ int WINAPI main() {
 
     DWORD processId = memory::GetProcess(processName);
     if (!processId) {
-        std::wcerr << L"Процесс не найден: " << processName << std::endl;
+        std::wcerr << L"ГЏГ°Г®Г¶ГҐГ±Г± Г­ГҐ Г­Г Г©Г¤ГҐГ­: " << processName << std::endl;
         return 1;
     }
 
 
     memory::processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, processId);
     if (!memory::processHandle) {
-        std::cerr << "Не удалось открыть процесс." << std::endl;
+        std::cerr << "ГЌГҐ ГіГ¤Г Г«Г®Г±Гј Г®ГІГЄГ°Г»ГІГј ГЇГ°Г®Г¶ГҐГ±Г±." << std::endl;
         return 1;
     }
 
 
     if (!memory::GetModuleInfo(processId, moduleName)) {
-        std::wcerr << L"Модуль не найден: " << moduleName << std::endl;
+        std::wcerr << L"ГЊГ®Г¤ГіГ«Гј Г­ГҐ Г­Г Г©Г¤ГҐГ­: " << moduleName << std::endl;
         CloseHandle(memory::processHandle);
         return 1;
     }
