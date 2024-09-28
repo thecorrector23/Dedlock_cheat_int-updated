@@ -21,12 +21,12 @@ namespace offsets
 
 
     constexpr std::ptrdiff_t m_iTeamNum = 0x3EB;
-    constexpr std::ptrdiff_t m_fFlags = 0x3f8;
+    constexpr std::ptrdiff_t m_fFlags = 0x3f4;
     constexpr std::ptrdiff_t m_iHealth = 0x34C;
     constexpr std::ptrdiff_t m_iszPlayerName = 0x640;
-    constexpr std::ptrdiff_t m_hPlayerPawn = 0xa90;
+    constexpr std::ptrdiff_t m_hPlayerPawn = 0xf10;
 
     constexpr std::ptrdiff_t m_vecAbsOrigin = 0xD0;
-    constexpr std::ptrdiff_t m_vOldOrigin = 0xEE4;
+    constexpr std::ptrdiff_t m_vOldOrigin = 0xEEC;
     constexpr std::ptrdiff_t m_vecViewOffset = 0x7d0; 
 }
