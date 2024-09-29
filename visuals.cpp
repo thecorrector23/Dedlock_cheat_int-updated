@@ -1,349 +1,238 @@
-#pragma once
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include "MinHook/MinHook.h"
-#if _WIN64 
-#pragma comment(lib, "MinHook/libMinHook.x64.lib")
-#else
-#pragma comment(lib, "MinHook/libMinHook.x86.lib")
-#endif
+#include "visuals.h"
+#include <chrono>
+#include <vector>
+#include <sstream>
+#include <iomanip>
+#include <cstring>
 
-#include "ImGui/imgui.h"
-#include "ImGui/imgui_impl_win32.h"
-#include "ImGui/imgui_impl_dx11.h"
-#include <d3d11.h>
-#include "visuals.h"  
-#include "aimbot.h"
-#pragma comment(lib, "d3d11.lib")
-#include "beepbob.h"
-#include "movment.h" 
+std::string read_str_from_memory(uintptr_t address) {
+    uintptr_t pointer_to_string = memory::memRead<uintptr_t>(address);
+    if (!pointer_to_string) return "";
 
+    const size_t max_length = 1024;
+    char buffer[max_length] = { 0 };
 
-#include "memory.h"
-#include <iostream>
-#include "sniper.h" 
-#include "freecam.h"
-
-HINSTANCE dll_handle;
-typedef long(__stdcall* present)(IDXGISwapChain*, UINT, UINT);
-present p_present;
-present p_present_target;
-
-uint8_t local_team = 0;
-bool aimbot_active = false;
-
-bool get_present_pointer() {
-    DXGI_SWAP_CHAIN_DESC sd;
-    ZeroMemory(&sd, sizeof(sd));
-    sd.BufferCount = 2;
-    sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    sd.OutputWindow = GetForegroundWindow();
-    sd.SampleDesc.Count = 1;
-    sd.Windowed = TRUE;
-    sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-    IDXGISwapChain* swap_chain;
-    ID3D11Device* device;
-
-    const D3D_FEATURE_LEVEL feature_levels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
-    if (D3D11CreateDeviceAndSwapChain(
-        NULL,
-        D3D_DRIVER_TYPE_HARDWARE,
-        NULL,
-        0,
-        feature_levels,
-        2,
-        D3D11_SDK_VERSION,
-        &sd,
-        &swap_chain,
-        &device,
-        nullptr,
-        nullptr) == S_OK) {
-        void** p_vtable = *reinterpret_cast<void***>(swap_chain);
-        swap_chain->Release();
-        device->Release();
-        p_present_target = (present)p_vtable[8];
-        return true;
+    SIZE_T bytesRead;
+    if (!ReadProcessMemory(memory::processHandle, reinterpret_cast<LPCVOID>(pointer_to_string), buffer, max_length - 1, &bytesRead) || bytesRead == 0) {
+        return "";
     }
-    return false;
+
+    return std::string(buffer);
 }
 
-WNDPROC oWndProc;
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-        return true;
+enum HealthDisplayMode {
+    HEALTH_NONE = 0,
+    HEALTH_BAR,
+    HEALTH_NUMBER
+};
 
-    return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+HealthDisplayMode health_display_mode = HEALTH_BAR;
+
+ImColor LerpColor(const ImColor& col1, const ImColor& col2, float t) {
+    return ImColor(
+        col1.Value.x + t * (col2.Value.x - col1.Value.x),
+        col1.Value.y + t * (col2.Value.y - col1.Value.y),
+        col1.Value.z + t * (col2.Value.z - col1.Value.z)
+    );
 }
 
-bool init = false;
-HWND window = NULL;
-ID3D11Device* p_device = NULL;
-ID3D11DeviceContext* p_context = NULL;
-ID3D11RenderTargetView* mainRenderTargetView = NULL;
+const float screen_center_x = GetSystemMetrics(SM_CXSCREEN) / 2.0f;
+const float screen_height = static_cast<float>(GetSystemMetrics(SM_CYSCREEN));
 
-void RenderMenu() {
-    ImGui::Begin("Deadlock");
-    if (ImGui::BeginTabBar("##tabs")) {
-   
-        if (ImGui::BeginTabItem("Render")) {
-            //Visuals1::RenderSettingsMenu();
-            ImGui::EndTabItem();
-        }
+std::vector<EntityCache> Visuals1::entityCache;
+std::chrono::time_point<std::chrono::steady_clock> Visuals1::lastCacheUpdate = std::chrono::steady_clock::now();
+const int Visuals1::cacheUpdateInterval = 1000;
 
-       
-        if (ImGui::BeginTabItem("Aimbot")) {
-            Aimbot::RenderAimbotSettingsMenu();
-            BebopHook::RenderBebopSettingsMenu();
-            SniperAutoAim::RenderSniperSettingsMenu();
-            ImGui::EndTabItem();
-        }
+float Visuals1::boxThickness = 1.0f;
+float Visuals1::lineThickness = 1.0f;
+ImVec4 Visuals1::boxColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+ImVec4 Visuals1::lineColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+bool Visuals1::esp_show_head = false;
+bool Visuals1::esp_show_circle = false;
+float Visuals1::esp_distance_radius = 2400.0f;
+bool Visuals1::esp_box_enabled = true;
+bool Visuals1::esp_line_enabled = true;
+bool Visuals1::esp_health_enabled = true;
+bool Visuals1::show_health = true;
+bool Visuals1::show_max_health = true;
+bool Visuals1::esp_show_address = false;
+bool Visuals1::esp_show_name = false;
 
-     
-        if (ImGui::BeginTabItem("Movement")) {
-            render_movement_settings();  
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Extra")) {
-            freecam::RenderFreeCamMenu();
-            ImGui::EndTabItem();
-        }
-
-
-        ImGui::EndTabBar();
-    }
-    ImGui::End();
-}
-
-
-static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_interval, UINT flags) {
-    if (!init) {
-        if (SUCCEEDED(p_swap_chain->GetDevice(__uuidof(ID3D11Device), (void**)&p_device))) {
-            p_device->GetImmediateContext(&p_context);
-            DXGI_SWAP_CHAIN_DESC sd;
-            p_swap_chain->GetDesc(&sd);
-            window = sd.OutputWindow;
-            ID3D11Texture2D* pBackBuffer;
-            p_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-            p_device->CreateRenderTargetView(pBackBuffer, NULL, &mainRenderTargetView);
-            pBackBuffer->Release();
-            oWndProc = (WNDPROC)SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)WndProc);
-            ImGui::CreateContext();
-            ImGuiIO& io = ImGui::GetIO();
-            io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
-            ImGui_ImplWin32_Init(window);
-            ImGui_ImplDX11_Init(p_device, p_context);
-            init = true;
-        }
-        else
-            return p_present(p_swap_chain, sync_interval, flags);
-    }
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-
-    RenderMenu(); 
-    process_movement_logic(); 
-
-
-    uintptr_t local_entity = find_local_player(local_team);
-    ViewMatrix vm = get_view_matrix();  
-
-
-    uintptr_t cammanagerAddress = memory::memRead<uintptr_t>(memory::baseAddress + (offsets::CCitadelCameraManager + 0x28));
-    Vector3 cammanager_pos = memory::memRead<Vector3>(cammanagerAddress+0x38);
-
-
-
-    ViewMatrix view_matrix = memory::memRead<ViewMatrix>(memory::baseAddress + offsets::dwViewMatrix);
-
-
-    /*
-    // Âûâîä ViewMatrix â ImGui
-    ImGui::Text("ViewMatrix:");
-    for (int i = 0; i < 4; ++i) {
-        ImGui::Text("[%.2f, %.2f, %.2f, %.2f]",
-            view_matrix.matrix[i][0],
-            view_matrix.matrix[i][1],
-            view_matrix.matrix[i][2],
-            view_matrix.matrix[i][3]);
-    }
-    */
-
-    uintptr_t local_pawn = memory::memRead<uintptr_t>(memory::baseAddress + 0x1F44280);
-    /*
-    char address_str[32];
-    sprintf_s(address_str, sizeof(address_str), "0x%08llX", local_pawn);
-    ImGui::Text("Local Pawn Address: %s", address_str);
-
-
+void Visuals1::UpdateEntityCache() {
     ULONG_PTR entity_list = get_entity_list();
-    int max_entities = get_max_entities();
+    int max_ents = get_max_entities();
+    entityCache.clear();
+    entityCache.reserve(max_ents);
 
-    for (int i = 1; i <= max_entities; ++i) {
+    for (int i = 1; i <= max_ents; ++i) {
         uintptr_t entity = get_base_entity_from_index(i, entity_list);
         if (!entity) continue;
 
-        uint32_t health = memory::memRead<uint32_t>(entity + 0x34c);
-        Vector3 entity_pos = memory::memRead<Vector3>(entity + offsets::m_vOldOrigin);
-
-
-        char address_str[32];
-        sprintf_s(address_str, sizeof(address_str), "0x%08llX", entity);
-
-
         std::string designer_name = get_designer_name(entity);
+        if (designer_name != "player") continue;
 
+        EntityCache cache;
+        cache.entityAddress = entity;
+        cache.team = memory::memRead<uint8_t>(entity + 0x3eb);
+        cache.isValid = true;
 
+        std::ostringstream ss;
+        ss << "0x" << std::hex << std::uppercase << entity;
+        cache.entityAddressStr = ss.str();
 
-        ImGui::Text("%s: %s | Position: X: %.2f, Y: %.2f, Z: %.2f | Health: %d",
-            designer_name.c_str(), address_str,
-            entity_pos.X, entity_pos.Y, entity_pos.Z, health);
-
-    }
-      */
-
-    Vector3 local_player_pos = memory::memRead<Vector3>(local_pawn + offsets::m_vOldOrigin);
-
-
-    if (Visuals1::esp_box_enabled || Visuals1::esp_line_enabled || Visuals1::esp_health_enabled) {
-        Visuals1::PlayerEsp(local_team);
-    }
-
-    freecam::NavigateEnemies(local_team);
-    freecam::UpdateCameraPosition();
-    
-
-    if (Aimbot::settings.enabled) {  
-        if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
-            Aimbot::settings.active = true;
+        uintptr_t name_ptr = memory::memRead<uintptr_t>(entity + 0x840);
+        if (name_ptr) {
+            std::string model_path = read_str_from_memory(name_ptr + 0x830);
+            cache.entityName = get_entity_human_name(model_path);
+            cache.headBoneIndex = get_bone_head_index(cache.entityName);
         }
         else {
-            Aimbot::settings.active = false;
-            Aimbot::settings.targetLocked = false;
-        }
-        Aimbot::AimbotLogic(local_entity, local_team, cammanager_pos, vm);  
-        Aimbot::DrawFOVCircle(Aimbot::settings.fov);
-    }
-
-    if (BebopHook::hook_active) {
-        BebopHook::BebopAutoHookLogic(local_entity, local_team, cammanager_pos, vm);
-    }
-
-    if (SniperAutoAim::aim_active) {
-        SniperAutoAim::SniperAutoAimLogic(local_entity, local_team, cammanager_pos, vm);  
-    }
-
-    ImGui::EndFrame();
-    ImGui::Render();
-
-    p_context->OMSetRenderTargets(1, &mainRenderTargetView, NULL);
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-    return p_present(p_swap_chain, sync_interval, flags);
-}
-
-DWORD __stdcall EjectThread(LPVOID lpParameter) {
-    Sleep(100);
-    FreeLibraryAndExitThread(dll_handle, 0);
-    Sleep(100);
-    return 0;
-}
-
-int WINAPI main() {
-
-    const wchar_t* processName = L"project8.exe";
-    const wchar_t* moduleName = L"client.dll";
-
-
-    DWORD processId = memory::GetProcess(processName);
-    if (!processId) {
-        std::wcerr << L"Ïðîöåññ íå íàéäåí: " << processName << std::endl;
-        return 1;
-    }
-
-
-    memory::processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, processId);
-    if (!memory::processHandle) {
-        std::cerr << "Íå óäàëîñü îòêðûòü ïðîöåññ." << std::endl;
-        return 1;
-    }
-
-
-    if (!memory::GetModuleInfo(processId, moduleName)) {
-        std::wcerr << L"Ìîäóëü íå íàéäåí: " << moduleName << std::endl;
-        CloseHandle(memory::processHandle);
-        return 1;
-    }
-
-
-    offsets::initializeOffsets();
-
-
-    Visuals1::UpdateEntityCache();
-
-    if (!get_present_pointer()) {
-        return 1;
-    }
-
-    MH_STATUS status = MH_Initialize();
-    if (status != MH_OK) {
-        return 1;
-    }
-
-    if (MH_CreateHook(reinterpret_cast<void**>(p_present_target), &detour_present, reinterpret_cast<void**>(&p_present)) != MH_OK) {
-        return 1;
-    }
-
-    if (MH_EnableHook(p_present_target) != MH_OK) {
-        return 1;
-    }
-
-    while (true) {
-        Sleep(50);
-
-        if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
-
+            cache.entityName = "Unknown";
+            cache.headBoneIndex = -1;
         }
 
-        if (GetAsyncKeyState(VK_DELETE)) {
-            break;
-        }
+        entityCache.push_back(cache);
     }
-
-    if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
-        return 1;
-    }
-    if (MH_Uninitialize() != MH_OK) {
-        return 1;
-    }
-
-    ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
-
-    if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
-    if (p_context) { p_context->Release(); p_context = NULL; }
-    if (p_device) { p_device->Release(); p_device = NULL; }
-    SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
-
-
-    CloseHandle(memory::processHandle);
-
-    CreateThread(0, 0, EjectThread, 0, 0, 0);
-
-    return 0;
+    lastCacheUpdate = std::chrono::steady_clock::now();
 }
 
-BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
-    if (dwReason == DLL_PROCESS_ATTACH) {
-        dll_handle = hModule;
-        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)main, NULL, 0, NULL);
-    }
-    else if (dwReason == DLL_PROCESS_DETACH) {
+void Visuals1::PlayerEsp(uint8_t& local_team) {
+    uintptr_t local_pawn = memory::memRead<uintptr_t>(memory::baseAddress + 0x20fd718);
+    if (!local_pawn) return;
 
+    Vector3 local_player_pos = memory::memRead<Vector3>(local_pawn + offsets::m_vOldOrigin);
+    ViewMatrix view_matrix = get_view_matrix();
+
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastCacheUpdate).count() > cacheUpdateInterval) {
+        UpdateEntityCache();
     }
-    return TRUE;
+
+    for (auto& cache : entityCache) {
+        if (!cache.isValid || cache.entityAddress == local_pawn || cache.team == local_team) continue;
+
+        uint32_t isVisible = memory::memRead<uint32_t>(cache.entityAddress + 0x30);
+        if (isVisible != 1) continue;
+
+        uint32_t health = memory::memRead<uint32_t>(cache.entityAddress + 0x34c);
+        uint32_t health_max = memory::memRead<uint32_t>(cache.entityAddress + 0x348);
+        if (health <= 0) continue;
+        if (health > health_max) health_max = health;
+
+        Vector3 entity_world_pos = memory::memRead<Vector3>(cache.entityAddress + offsets::m_vOldOrigin);
+        Vector3 entity_head_pos = (esp_show_head && cache.headBoneIndex != -1)
+            ? get_bone_position_by_index(cache.entityAddress, cache.headBoneIndex)
+            : entity_world_pos + Vector3(0, 0, 92.0f);
+
+        Vector3 screen_pos_foot = WorldToScreen(view_matrix, entity_world_pos);
+        Vector3 screen_pos_head = WorldToScreen(view_matrix, entity_head_pos);
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+
+        if (screen_pos_foot.Z < 0.01f || screen_pos_head.Z < 0.01f) continue;
+        if (esp_line_enabled) {
+            draw_list->AddLine(ImVec2(screen_center_x, screen_height), ImVec2(screen_pos_foot.X, screen_pos_foot.Y), ImColor(lineColor), lineThickness);
+        }
+
+        float distance_to_enemy = (local_player_pos - entity_world_pos).Length();
+        if (esp_show_circle && distance_to_enemy <= esp_distance_radius) {
+            draw_list->AddCircleFilled(ImVec2(screen_pos_head.X, screen_pos_head.Y - 20.0f), 8.0f, ImColor(0, 255, 0));
+        }
+
+        float box_height = screen_pos_foot.Y - screen_pos_head.Y;
+        float box_width = box_height / 2.0f;
+        if (esp_box_enabled) {
+            draw_list->AddRect(ImVec2(screen_pos_head.X - box_width / 2, screen_pos_head.Y),
+                ImVec2(screen_pos_head.X + box_width / 2, screen_pos_foot.Y), ImColor(boxColor), 0.0f, 0, boxThickness);
+        }
+
+        if (esp_show_head) {
+            draw_list->AddCircle(ImVec2(screen_pos_head.X, screen_pos_head.Y), 5.0f, ImColor(255, 255, 0), 16, 2.0f);
+        }
+
+        if (esp_health_enabled) {
+            if (health_display_mode == HEALTH_BAR) {
+                float health_percentage = static_cast<float>(health) / static_cast<float>(health_max);
+                ImColor health_color = LerpColor(ImColor(255, 0, 0), ImColor(0, 255, 0), health_percentage);
+                draw_list->AddRect(ImVec2(screen_pos_head.X - box_width / 2 - 8.0f, screen_pos_head.Y),
+                    ImVec2(screen_pos_head.X - box_width / 2 - 4.5f, screen_pos_foot.Y), ImColor(255, 255, 255));
+                draw_list->AddRectFilled(ImVec2(screen_pos_head.X - box_width / 2 - 7.5f, screen_pos_foot.Y - box_height * health_percentage),
+                    ImVec2(screen_pos_head.X - box_width / 2 - 4.5f, screen_pos_foot.Y), health_color);
+            }
+            else if (health_display_mode == HEALTH_NUMBER) {
+                std::string health_info = std::to_string(health) + "/" + std::to_string(health_max);
+                draw_list->AddText(ImVec2(screen_pos_head.X - 25, screen_pos_head.Y), ImColor(255, 255, 255), health_info.c_str());
+            }
+        }
+
+        if (esp_show_name) {
+            draw_list->AddText(ImVec2(screen_pos_head.X - box_width / 2, screen_pos_head.Y - 20.0f), ImColor(255, 255, 255), cache.entityName.c_str());
+        }
+
+        if (esp_show_address) {
+            draw_list->AddText(ImVec2(screen_pos_head.X - box_width / 2, screen_pos_head.Y - 30.0f), ImColor(255, 255, 255), cache.entityAddressStr.c_str());
+        }
+    }
+}
+
+void Visuals1::RenderSettingsMenu() {
+    static bool circle_settings_visible = true;
+    if (ImGui::Checkbox("Enable ESP Circle", &esp_show_circle)) {
+        circle_settings_visible = esp_show_circle;
+    }
+    if (circle_settings_visible) {
+        ImGui::Indent();
+        ImGui::SliderFloat("Circle Distance Radius", &esp_distance_radius, 500.0f, 5000.0f, "Radius: %.0f");
+        ImGui::Unindent();
+    }
+
+    static bool box_settings_visible = true;
+    if (ImGui::Checkbox("Enable ESP Box", &esp_box_enabled)) {
+        box_settings_visible = esp_box_enabled;
+    }
+    if (box_settings_visible) {
+        ImGui::Indent();
+        ImGui::SliderFloat("Box Thickness", &boxThickness, 1.0f, 10.0f, "Thickness: %.1f");
+        ImGui::ColorEdit4("Box Color", (float*)&boxColor);
+        ImGui::Unindent();
+    }
+
+    static bool line_settings_visible = true;
+    if (ImGui::Checkbox("Enable ESP Line", &esp_line_enabled)) {
+        line_settings_visible = esp_line_enabled;
+    }
+    if (line_settings_visible) {
+        ImGui::Indent();
+        ImGui::SliderFloat("Line Thickness", &lineThickness, 1.0f, 10.0f, "Thickness: %.1f");
+        ImGui::ColorEdit4("Line Color", (float*)&lineColor);
+        ImGui::Unindent();
+    }
+
+    static bool health_settings_visible = true;
+    if (ImGui::Checkbox("Enable ESP Health", &esp_health_enabled)) {
+        health_settings_visible = esp_health_enabled;
+    }
+    if (health_settings_visible) {
+        ImGui::Indent();
+        ImGui::Text("Health Display Mode");
+        if (ImGui::RadioButton("Health Bar", health_display_mode == HEALTH_BAR)) {
+            health_display_mode = HEALTH_BAR;
+        }
+        if (ImGui::RadioButton("Health Number", health_display_mode == HEALTH_NUMBER)) {
+            health_display_mode = HEALTH_NUMBER;
+        }
+        ImGui::Unindent();
+    }
+
+    static bool name_settings_visible = false;
+    if (ImGui::Checkbox("Show Entity Name", &esp_show_name)) {
+        name_settings_visible = esp_show_name;
+    }
+    static bool address_settings_visible = false;
+    if (ImGui::Checkbox("Show Entity Address", &esp_show_address)) {
+        address_settings_visible = esp_show_address;
+    }
+    static bool head_settings_visible = false;
+    if (ImGui::Checkbox("Show Entity Head", &esp_show_head)) {
+        head_settings_visible = esp_show_head;
+    }
 }
