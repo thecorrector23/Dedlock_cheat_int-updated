@@ -7,7 +7,6 @@
 #include <chrono>
 
 namespace BebopHook {
-
     extern bool hook_active;         
     extern int hook_speed;          
     extern bool target_locked;         
@@ -16,15 +15,10 @@ namespace BebopHook {
     extern bool enable_delay;          
     extern std::chrono::steady_clock::time_point last_target_time; 
 
-
     void RenderBebopSettingsMenu();
-
-
     void BebopAutoHookLogic(uintptr_t local_entity, uint8_t local_team, Vector3 local_player_pos, ViewMatrix vm);
 
-
     Vector3 get_closest_enemy_to_cursor(const Vector3& local_player_pos, const ViewMatrix& vm, const uintptr_t& local_entity, const uint8_t local_team, int& closest_index);
-
 
     void TriggerHook();
 }
