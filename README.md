@@ -7,6 +7,7 @@ My discord: miguelribeirinho
 # I will continue to update the cheat and offsets almost every time a new update comes out
 
 THE GAME HAS AN ANTI CHEAT NOW
+I will try to implement a mouse driver with the aimbot
 
 If your PC is not good enough you can increase the cacheUpdateInterval of the visuals (1000 to 10000)
 
