@@ -6,7 +6,6 @@
 #include <map>
 #include <string>
 
-
 std::string GetKeyName1(int key) {
     static std::map<int, std::string> keyNames = {
         { VK_LBUTTON, "MOUSE1" },
@@ -99,14 +98,11 @@ std::string GetKeyName1(int key) {
         { VK_OEM_6, "]" },
         { VK_OEM_7, "'" }
     };
-
     if (keyNames.find(key) != keyNames.end()) {
         return keyNames[key];
     }
-
     return "Unknown";
 }
-
 
 bool BebopHook::hook_active = false;
 int BebopHook::hook_speed = 2500;
@@ -119,15 +115,12 @@ int hookActivationKey = 'F';
 
 constexpr float PI = 3.14159f;
 
-
 inline Vector3 CalcAngle(const Vector3& playerPosition, const Vector3& enemyPosition) {
     Vector3 delta = enemyPosition - playerPosition;
     float yaw = atan2f(delta.Y, delta.X) * (180.0f / PI);  
     float pitch = atan2f(delta.Z, sqrt(delta.X * delta.X + delta.Y * delta.Y)) * (180.0f / PI);  
     return Vector3(-pitch, yaw, 0.0f); 
 }
-
-
 
 inline Vector3 NormalizeAngles(Vector3 angle) {
     if (angle.X > 89.0f) angle.X = 89.0f;
@@ -140,16 +133,13 @@ inline Vector3 NormalizeAngles(Vector3 angle) {
     return angle;
 }
 
-
 void BebopHook::BebopAutoHookLogic(uintptr_t local_entity, uint8_t local_team, Vector3 local_player_pos, ViewMatrix vm) {
     if (!(GetAsyncKeyState(hookActivationKey) & 0x8000)) {
         target_locked = false;
         locked_target_index = -1;
         return;
     }
-
     if (!hook_active) return;
-
     int closest_index = -1;
     Vector3 closest_enemy_position = get_closest_enemy_to_cursor(local_player_pos, vm, local_entity, local_team, closest_index);
 
@@ -171,7 +161,6 @@ void BebopHook::BebopAutoHookLogic(uintptr_t local_entity, uint8_t local_team, V
             locked_target_index = -1;
         }
         else {
-           
             uint32_t entity_hp = memory::memRead<uint32_t>(target.entityAddress + 0x34c);
             if (entity_hp <= 0) { 
                 target_locked = false;
@@ -212,25 +201,20 @@ void BebopHook::BebopAutoHookLogic(uintptr_t local_entity, uint8_t local_team, V
     }
 }
 
-
-
 void BebopHook::TriggerHook() {
     INPUT input = { 0 };
     input.type = INPUT_KEYBOARD;
     input.ki.wVk = '3';  
     SendInput(1, &input, sizeof(INPUT));
-
     input.ki.dwFlags = KEYEVENTF_KEYUP;  
     SendInput(1, &input, sizeof(INPUT));
 }
-
 
 Vector3 BebopHook::get_closest_enemy_to_cursor(const Vector3& local_player_pos, const ViewMatrix& vm, const uintptr_t& local_entity, const uint8_t local_team, int& closest_index) {
     float closest_distance = FLT_MAX;
     Vector3 closest_enemy_position;
     const float screen_center_x = GetSystemMetrics(SM_CXSCREEN) / 2.0f;
     const float screen_center_y = GetSystemMetrics(SM_CYSCREEN) / 2.0f;
-
     for (int i = 0; i < Visuals1::entityCache.size(); ++i) {
         const auto& entity = Visuals1::entityCache[i];
 
@@ -251,10 +235,8 @@ Vector3 BebopHook::get_closest_enemy_to_cursor(const Vector3& local_player_pos, 
             closest_index = i;
         }
     }
-
     return closest_enemy_position;
 }
-
 
 void BebopHook::RenderBebopSettingsMenu() {
     if (ImGui::Checkbox("Enable Bebop AutoHook", &hook_active)) {
@@ -264,14 +246,11 @@ void BebopHook::RenderBebopSettingsMenu() {
         ImGui::SliderInt("Hook Speed", &hook_speed, 1000, 10000, "Speed: %100");
         ImGui::SliderFloat("Aim Smoothness", &aim_smoothness, 1.0f, 10.0f, "Smoothness: %.1f");
         ImGui::Checkbox("Enable Delay Before Hook", &enable_delay);
-
-     
         ImGui::Text("Hook Activation Key:");
         ImGui::SameLine();
         if (ImGui::Button("Choose Key")) {
             ImGui::OpenPopup("key_popup");
         }
-
         if (ImGui::BeginPopup("key_popup")) {
             ImGui::Text("Press any key to set it as the activation key");
             for (int i = 0; i < 256; ++i) {
@@ -282,11 +261,8 @@ void BebopHook::RenderBebopSettingsMenu() {
             }
             ImGui::EndPopup();
         }
-
-    
         std::string keyName = GetKeyName1(hookActivationKey);
         ImGui::Text("Current Hook Activation Key: %s", keyName.c_str());
-
         ImGui::TreePop();
     }
 }
