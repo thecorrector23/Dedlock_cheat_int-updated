@@ -24,6 +24,5 @@ public:
     static bool is_target_in_cooldown(int target_index);
 };
 
-
 Vector3 CalcAngle1(const Vector3& playerPosition, const Vector3& enemyPosition);
 Vector3 NormalizeAngles1(Vector3 angle);
