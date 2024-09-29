@@ -1,15 +1,14 @@
-Since downloading from Github is causing weird errors in VS here's the download link
+All the code has been updated, if you get errors in VS let me know in my Discord
+
+Downloading from Github is causing weird errors in VS for some users, here's the download link of the source code
 https://gofile.io/d/Z93HAY
 
 My discord: miguelribeirinho
 # -------------------------
 
 # I will continue to update the cheat and offsets almost every time a new update comes out
-
 THE GAME HAS AN ANTI CHEAT NOW
-I will try to implement a mouse driver with the aimbot
 
-If your PC is not good enough you can increase the cacheUpdateInterval of the visuals (1000 to 10000)
 
 # DeadLock UC Post (MidTano)
 
