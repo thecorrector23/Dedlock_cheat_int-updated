@@ -28,7 +28,6 @@ static const std::unordered_map<std::string, std::string> model_to_name_map = {
     {"models/heroes_staging/mirage/mirage.vmdl", "MIRAGE"}
 };
 
-
 static const std::unordered_map<std::string, int> model_to_head_bone_map = {
     {"ABRAMS", 7},
     {"BEBOP", 6},
@@ -55,7 +54,6 @@ static const std::unordered_map<std::string, int> model_to_head_bone_map = {
     {"models/heroes_staging/gen_man/gen_man.vmdl", 12}
 };
 
-
 int get_bone_head_index(const std::string& model_path) {
     auto it = model_to_head_bone_map.find(model_path);
     if (it != model_to_head_bone_map.end()) {
@@ -63,9 +61,6 @@ int get_bone_head_index(const std::string& model_path) {
     }
     return -1;
 }
-
-
-
 
 Vector3 get_bone_position_by_index(uintptr_t entity, int bone_index) {
     uintptr_t gameSceneNode = memory::memRead<uintptr_t>(entity + offsets::m_pGameSceneNode);
@@ -93,17 +88,13 @@ std::vector<Vector3> get_bone_positions(uintptr_t entity) {
         Vector3 bonePos = memory::memRead<Vector3>(boneAddress);
         bone_positions.push_back(bonePos);
     }
-
     return bone_positions;
 }
-
 
 std::string get_entity_human_name(const std::string& model_path) {
     auto it = model_to_name_map.find(model_path);
     return (it != model_to_name_map.end()) ? it->second : "Unknown";
 }
-
-
 
 ULONG_PTR get_entity_list() {
     return static_cast<ULONG_PTR>(memory::memRead<uintptr_t>(memory::baseAddress + offsets::dwEntityList));
@@ -123,7 +114,6 @@ uintptr_t get_base_entity_from_index(int index, ULONG_PTR entity_list) {
         entity += 120LL * (index & 0x1FF);
         return memory::memRead<uintptr_t>(entity);
     }
-
     return 0;
 }
 
@@ -157,25 +147,20 @@ uintptr_t find_local_player(uint8_t& local_team) {
             return entity;
         }
     }
-
     return 0;
 }
 
 uintptr_t find_local_player_pawn() {
-
     uint8_t local_team = 0;
     uintptr_t local_player = find_local_player(local_team);
     if (!local_player) return 0;
-
 
     ULONG_PTR entity_list = get_entity_list();
     int max_entities = get_max_entities();
 
     uintptr_t closest_pawn = 0;
-    uintptr_t local_controller = memory::memRead<uintptr_t>(local_player + 0x60c); 
+    uintptr_t local_controller = memory::memRead<uintptr_t>(local_player + 0x60c);
     uintptr_t local_address = local_player;
-
-
 
     for (int i = 1; i <= max_entities; ++i) {
         uintptr_t entity = get_base_entity_from_index(i, entity_list);
@@ -183,17 +168,14 @@ uintptr_t find_local_player_pawn() {
 
         std::string designer_name = get_designer_name(entity);
 
-
         if (designer_name != "player") continue;
 
         uintptr_t pawn_controller = memory::memRead<uintptr_t>(entity); 
         if (pawn_controller != local_controller) continue;
 
-
         if (closest_pawn == 0 || std::llabs(static_cast<intptr_t>(entity) - local_address) < std::llabs(static_cast<intptr_t>(closest_pawn) - local_address)) {
             closest_pawn = entity;
         }
     }
-
     return local_player;
 }
