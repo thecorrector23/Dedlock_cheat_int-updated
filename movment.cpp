@@ -5,7 +5,6 @@
 
 bool shift_held = false, ctrl_held = false, space_pressed = false, script_enabled = true;
 auto shift_press_time = std::chrono::steady_clock::now();
-
 int delay_before_space = 300, delay_before_ctrl = 1000, initial_shift_delay = 250;
 int min_delay = 100, max_delay = 2000;
 
@@ -18,8 +17,9 @@ void process_movement_logic() {
             space_pressed = false;
             shift_press_time = std::chrono::steady_clock::now();
         }
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - shift_press_time).count();
+
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - shift_press_time).count();
+        
         if (duration > initial_shift_delay && duration < delay_before_ctrl) {
             if (duration > delay_before_space && !space_pressed) {
                 keybd_event(VK_SPACE, 0, 0, 0);
@@ -40,7 +40,6 @@ void process_movement_logic() {
 
 void render_movement_settings() {
     ImGui::Checkbox("Enable Shift Script", &script_enabled);
-
     ImGui::SliderInt("Delay Before Space (ms)", &delay_before_space, min_delay, max_delay);
     ImGui::SliderInt("Delay Before Ctrl (ms)", &delay_before_ctrl, min_delay, max_delay);
     ImGui::SliderInt("Initial Shift Delay (ms)", &initial_shift_delay, min_delay, max_delay);
