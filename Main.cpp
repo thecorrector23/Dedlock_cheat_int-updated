@@ -17,8 +17,6 @@
 #pragma comment(lib, "d3d11.lib")
 #include "beepbob.h"
 #include "movment.h" 
-
-
 #include "memory.h"
 #include <iostream>
 #include "sniper.h" 
@@ -85,11 +83,11 @@ ID3D11DeviceContext* p_context = NULL;
 ID3D11RenderTargetView* mainRenderTargetView = NULL;
 
 void RenderMenu() {
-    ImGui::Begin("LLI_K_O_JI_b_H_U_K");
+    ImGui::Begin("Deadlock");
     if (ImGui::BeginTabBar("##tabs")) {
    
         if (ImGui::BeginTabItem("Render")) {
-            Visuals1::RenderSettingsMenu();
+            //Visuals1::RenderSettingsMenu();
             ImGui::EndTabItem();
         }
 
@@ -161,7 +159,7 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
 
 
     /*
-    // ¬˚‚Ó‰ ViewMatrix ‚ ImGui
+    // √Ç√ª√¢√Æ√§ ViewMatrix √¢ ImGui
     ImGui::Text("ViewMatrix:");
     for (int i = 0; i < 4; ++i) {
         ImGui::Text("[%.2f, %.2f, %.2f, %.2f]",
@@ -260,20 +258,20 @@ int WINAPI main() {
 
     DWORD processId = memory::GetProcess(processName);
     if (!processId) {
-        std::wcerr << L"œÓˆÂÒÒ ÌÂ Ì‡È‰ÂÌ: " << processName << std::endl;
+        std::wcerr << L"√è√∞√Æ√∂√•√±√± √≠√• √≠√†√©√§√•√≠: " << processName << std::endl;
         return 1;
     }
 
 
     memory::processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, processId);
     if (!memory::processHandle) {
-        std::cerr << "ÕÂ Û‰‡ÎÓÒ¸ ÓÚÍ˚Ú¸ ÔÓˆÂÒÒ." << std::endl;
+        std::cerr << "√ç√• √≥√§√†√´√Æ√±√º √Æ√≤√™√∞√ª√≤√º √Ø√∞√Æ√∂√•√±√±." << std::endl;
         return 1;
     }
 
 
     if (!memory::GetModuleInfo(processId, moduleName)) {
-        std::wcerr << L"ÃÓ‰ÛÎ¸ ÌÂ Ì‡È‰ÂÌ: " << moduleName << std::endl;
+        std::wcerr << L"√å√Æ√§√≥√´√º √≠√• √≠√†√©√§√•√≠: " << moduleName << std::endl;
         CloseHandle(memory::processHandle);
         return 1;
     }
