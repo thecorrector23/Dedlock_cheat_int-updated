@@ -6,8 +6,7 @@
 #include "visuals.h"
 #include <string>
 
-
-struct AimbotSettings {
+struct AimbotSettings { //default aimbot settings
     bool enabled = true;          
     bool targetLocked = false;      
     int lockedTargetIndex = -1;     
@@ -19,21 +18,15 @@ struct AimbotSettings {
     bool soulsAim = false;          
 };
 
-
 namespace Aimbot {
-
     extern AimbotSettings settings;
 
- 
     void AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3& localPlayerPos, const ViewMatrix& vm);
-
- 
     void RenderAimbotSettingsMenu();
     void DrawFOVCircle(float fov);
 
-
-
     float GetAngleDistance(const Vector3& screenPos);  
+
     Vector3 GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix& vm, uintptr_t localEntity, uint8_t localTeam, int& closestIndex, float fov);
     Vector3 GetClosestSoul(const Vector3& localPlayerPos, const ViewMatrix& vm, int& closestIndex, float fov);  
 
