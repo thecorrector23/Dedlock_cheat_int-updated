@@ -111,9 +111,7 @@ std::string Aimbot::GetKeyName(int key) {
     return "Unknown";
 }
 
-
 AimbotSettings Aimbot::settings;
-
 
 constexpr float DEG_TO_RAD = 3.14159265358979323846f / 180.0f;
 
@@ -135,18 +133,15 @@ float Aimbot::GetAngleDistance(const Vector3& screenPos) {
     return sqrtf(deltaX * deltaX + deltaY * deltaY);
 }
 
-
 void Aimbot::DrawFOVCircle(float fov) {
     if (!settings.enabled) return;
 
     ImDrawList* drawList = ImGui::GetForegroundDrawList();
 
-
     float fovRadians = fov * DEG_TO_RAD;
     float fovRadius = tanf(fovRadians / 2.0f) * screenDims.centerX;
 
     ImColor circleColor = settings.targetLocked ? ImColor(255, 0, 0, 255) : ImColor(255, 255, 255, 255);
-
 
     drawList->AddCircle(ImVec2(screenDims.centerX, screenDims.centerY), fovRadius, circleColor, 100, 2.0f);
 }
@@ -167,17 +162,14 @@ Vector3 Aimbot::GetClosestSoul(const Vector3& localPlayerPos, const ViewMatrix& 
 
         if (designer_name != "item_xp") continue; 
 
-
         uint32_t isVisible = memory::memRead<uint32_t>(entity + 0x30);
         if (isVisible != 1) continue;  
 
         uintptr_t soul_ptr = memory::memRead<uintptr_t>(entity + 0x328);  
         Vector3 soulWorldPos = memory::memRead<Vector3>(soul_ptr + 0x88); 
 
-
         Vector3 screenPos = WorldToScreen(vm, soulWorldPos);
         if (screenPos.Z <= 0.01f) continue;  
-
 
         float angleDistance = GetAngleDistance(screenPos);
         if (angleDistance < fovRadius && angleDistance < closestDistance) {
@@ -186,16 +178,12 @@ Vector3 Aimbot::GetClosestSoul(const Vector3& localPlayerPos, const ViewMatrix& 
             closestIndex = i;
         }
     }
-
     return closestSoulPosition;
 }
-
-
 
 bool IsAimbotKeyPressed() {
     return GetAsyncKeyState(Aimbot::settings.activationKey) & 0x8000;
 }
-
 
 void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3& localPlayerPos, const ViewMatrix& vm) {
     if (!settings.enabled || !IsAimbotKeyPressed()) return;
@@ -205,7 +193,6 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
     Vector3 closestTargetPos;
     bool targetIsSoul = false;
 
-
     if (settings.soulsAim) {
         Vector3 closestSoulPos = GetClosestSoul(localPlayerPos, vm, closestSoulIndex, settings.fov);
         if (closestSoulIndex != -1) {
@@ -214,7 +201,6 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
         }
     }
 
- 
     if (!targetIsSoul || closestSoulIndex == -1) {
         Vector3 closestEnemyPos = GetClosestEnemy(localPlayerPos, vm, localEntity, localTeam, closestPlayerIndex, settings.fov);
         if (closestPlayerIndex != -1) {
@@ -223,12 +209,9 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
         }
     }
 
-
     if (targetIsSoul && closestSoulIndex != -1) {
-
         settings.lockedTargetIndex = closestSoulIndex;
         settings.targetLocked = true;
-
 
         Vector3 screenPos = WorldToScreen(vm, closestTargetPos);
         if (screenPos.Z > 0.01f) {
@@ -236,10 +219,8 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
             float deltaX = screenPos.X - screenDims.centerX;
             float deltaY = screenPos.Y - screenDims.centerY;
 
-
             deltaX /= settings.smoothness;
             deltaY /= settings.smoothness;
-
 
             INPUT input = { 0 };
             input.type = INPUT_MOUSE;
@@ -263,24 +244,18 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
                 enemyHeadPos = get_bone_position_by_index(targetEntity.entityAddress, headBoneIndex);
             }
             else {
-
                 enemyHeadPos = memory::memRead<Vector3>(targetEntity.entityAddress + offsets::m_vOldOrigin);
-                enemyHeadPos.Z += 92.0f;
+                enemyHeadPos.Z += 80.0f;
             }
-
 
             Vector3 screenPos = WorldToScreen(vm, enemyHeadPos);
 
-
             if (!settings.targetLocked || screenPos.Z > 0.01f) {
-
                 float deltaX = screenPos.X - screenDims.centerX;
                 float deltaY = screenPos.Y - screenDims.centerY;
 
-
                 deltaX /= settings.smoothness;
                 deltaY /= settings.smoothness;
-
 
                 INPUT input = { 0 };
                 input.type = INPUT_MOUSE;
@@ -292,12 +267,10 @@ void Aimbot::AimbotLogic(uintptr_t localEntity, uint8_t localTeam, const Vector3
         }
     }
     else {
-     
         settings.targetLocked = false;
         settings.lockedTargetIndex = -1;
     }
 }
-
 
 Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix& vm, uintptr_t localEntity, uint8_t localTeam, int& closestIndex, float fov) {
     float closestDistance = FLT_MAX;
@@ -307,45 +280,35 @@ Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix&
     for (int i = 0; i < Visuals1::entityCache.size(); ++i) {
         const auto& entity = Visuals1::entityCache[i];
 
-
         if (!entity.isValid || entity.entityAddress == localEntity || entity.team == localTeam) {
             continue;
         }
 
-
         uint32_t entity_hp = memory::memRead<uint32_t>(entity.entityAddress + 0x34c);
         if (entity_hp <= 0) continue; 
 
-        
         if (!settings.targetLocked || settings.lockedTargetIndex != i) {
             uint32_t isVisible = memory::memRead<uint32_t>(entity.entityAddress + 0x30);
             if (isVisible != 1) continue; 
         }
 
-     
         Vector3 entityHeadPos;
         int headBoneIndex = get_bone_head_index(entity.entityName);
         if (headBoneIndex != -1) {
             entityHeadPos = get_bone_position_by_index(entity.entityAddress, headBoneIndex);
         }
         else {
-
             entityHeadPos = memory::memRead<Vector3>(entity.entityAddress + offsets::m_vOldOrigin);
-            entityHeadPos.Z += 92.0f;
+            entityHeadPos.Z += 80.0f;
         }
-
 
         float distanceToEnemy = (entityHeadPos - localPlayerPos).Length();
         if (distanceToEnemy > settings.maxDistance) continue;  
 
-
         Vector3 screenPos = WorldToScreen(vm, entityHeadPos);
 
         if (!settings.targetLocked || screenPos.Z > 0.01f) {
-   
             float angleDistance = GetAngleDistance(screenPos);
-
-      
             if (angleDistance < fovRadius && angleDistance < closestDistance) {
                 closestDistance = angleDistance;
                 closestEnemyPosition = entityHeadPos;
@@ -353,31 +316,23 @@ Vector3 Aimbot::GetClosestEnemy(const Vector3& localPlayerPos, const ViewMatrix&
             }
         }
     }
-
     return closestEnemyPosition;
 }
-
 
 void Aimbot::RenderAimbotSettingsMenu() {
     if (ImGui::Checkbox("Enable Aimbot", &settings.enabled)) {
         ImGui::SetNextItemOpen(false);
     }
-
     if (settings.enabled && ImGui::TreeNode("Aimbot Settings")) {
         ImGui::SliderFloat("Aimbot FOV", &settings.fov, 5.0f, 180.0f, "FOV: %.1f");
         ImGui::SliderFloat("Aimbot Smoothness", &settings.smoothness, 1.0f, 10.0f, "Smoothness: %.1f");
-        ImGui::SliderFloat("Max Distance", &settings.maxDistance, 100.0f, 5000.0f, "Max Distance: %.1f");
-
- 
+        ImGui::SliderFloat("Max Aim Distance", &settings.maxDistance, 100.0f, 5000.0f, "Max Distance: %.1f");
         ImGui::Checkbox("Souls Aim", &settings.soulsAim);
-
-
         ImGui::Text("Activation Key:");
         ImGui::SameLine();
         if (ImGui::Button("Choose Key")) {
             ImGui::OpenPopup("key_popup");
         }
-
         if (ImGui::BeginPopup("key_popup")) {
             ImGui::Text("Press any key to set it as the activation key");
             for (int i = 0; i < 256; ++i) {
@@ -388,10 +343,8 @@ void Aimbot::RenderAimbotSettingsMenu() {
             }
             ImGui::EndPopup();
         }
-
         std::string keyName = GetKeyName(settings.activationKey);
         ImGui::Text("Current Activation Key: %s", keyName.c_str());
-
         ImGui::TreePop();
     }
 }
