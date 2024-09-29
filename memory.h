@@ -10,7 +10,6 @@
 #define WIN32_LEAN_AND_MEAN
 
 namespace memory {
-
     extern uintptr_t baseAddress;
     extern size_t moduleSize;
     extern HANDLE processHandle;
@@ -29,13 +28,9 @@ namespace memory {
         ReadProcessMemory(processHandle, (LPCVOID)address, &value, sizeof(type), NULL);
         return value;
     }
-
     template <typename type>
     bool memWrite(uintptr_t address, type value) {
         return WriteProcessMemory(processHandle, (LPVOID)address, &value, sizeof(type), NULL);
     }
-
-    // Объявление новой функции безопасной записи в память
     bool memSafeWrite(uintptr_t address, const void* buffer, SIZE_T size);
-
 }
