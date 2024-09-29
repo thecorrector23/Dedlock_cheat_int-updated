@@ -4,7 +4,6 @@ Downloading from Github is causing weird errors in VS for some users, here's the
 https://gofile.io/d/Z93HAY
 
 My discord: miguelribeirinho
-# -------------------------
 
 # I will continue to update the cheat and offsets almost every time a new update comes out
 THE GAME HAS AN ANTI CHEAT NOW
