@@ -28,7 +28,6 @@ struct Vector3 {
     Vector3 operator*(float scalar) const;
     Vector3 operator/(float scalar) const;
 
-
     float Length() const;
 };
 
