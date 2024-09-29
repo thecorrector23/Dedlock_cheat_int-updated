@@ -41,10 +41,8 @@ void SniperAutoAim::SniperAutoAimLogic(uintptr_t local_entity, uint8_t local_tea
 
         uintptr_t cammanager = memory::memRead<uintptr_t>(memory::baseAddress + (offsets::CCitadelCameraManager + 0x28));
         if (cammanager) {
-            
             ReleaseMouseButtonsIfHeld();
 
-         
             PressKey('4');
             
             AimTenTimes(cammanager, local_entity, local_team, vm);
@@ -66,14 +64,12 @@ void SniperAutoAim::ReleaseMouseButtonsIfHeld() {
     SHORT leftButtonState = GetAsyncKeyState(VK_LBUTTON);
     SHORT rightButtonState = GetAsyncKeyState(VK_RBUTTON);
 
-
     if (leftButtonState & 0x8000) {
         INPUT mouseInput = { 0 };
         mouseInput.type = INPUT_MOUSE;
         mouseInput.mi.dwFlags = MOUSEEVENTF_LEFTUP;
         SendInput(1, &mouseInput, sizeof(mouseInput));
     }
-
     if (rightButtonState & 0x8000) {
         INPUT mouseInput = { 0 };
         mouseInput.type = INPUT_MOUSE;
@@ -101,25 +97,20 @@ bool SniperAutoAim::HoldRightMouseButtonFor100ms() {
     static bool is_holding = false;
 
     if (!is_holding) {
- 
         INPUT mouseInput = { 0 };
         mouseInput.type = INPUT_MOUSE;
         mouseInput.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
         SendInput(1, &mouseInput, sizeof(mouseInput));
 
-
         hold_start_time = std::chrono::steady_clock::now();
         is_holding = true;
     }
 
-   
     auto current_time = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::milliseconds>(current_time - hold_start_time).count() >= 30) {
-
         is_holding = false;
         return true;  
     }
-
     return false;  
 }
 
@@ -141,7 +132,6 @@ void SniperAutoAim::PressKey(int key) {
 }
 
 void SniperAutoAim::Fire() {
-  
     INPUT mouseInput = { 0 };
     mouseInput.type = INPUT_MOUSE;
     mouseInput.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
@@ -169,7 +159,6 @@ Vector3 SniperAutoAim::get_enemy_in_radius(const Vector3& local_player_pos, cons
             }
         }
     }
-
     return Vector3();
 }
 
@@ -184,7 +173,6 @@ bool SniperAutoAim::is_target_in_cooldown(int target_index) {
             return true;
         }
     }
-
     return false;
 }
 
