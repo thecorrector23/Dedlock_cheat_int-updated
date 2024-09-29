@@ -3,7 +3,6 @@
 #include "math.h"
 
 namespace freecam {
-
     extern uintptr_t freeCamAddress;
     extern uintptr_t heightAddress;
     extern uintptr_t cammanagerAddress;
