@@ -22,6 +22,7 @@ struct EntityCache {
 namespace Visuals1 {
     extern std::vector<EntityCache> entityCache;  
     extern std::chrono::time_point<std::chrono::steady_clock> lastCacheUpdate;
+
     extern const int cacheUpdateInterval;
     extern bool esp_show_head;  
     extern float boxThickness;
@@ -40,5 +41,5 @@ namespace Visuals1 {
  
     void UpdateEntityCache();
     void PlayerEsp(uint8_t& local_team);
-    //void RenderSettingsMenu();
+    void RenderSettingsMenu();
 }
