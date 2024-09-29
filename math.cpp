@@ -3,7 +3,6 @@
 #include "memory.h"
 #include <windows.h>
 
-
 Vector2::Vector2() : X(0), Y(0) {}
 Vector2::Vector2(float x, float y) : X(x), Y(y) {}
 
@@ -68,11 +67,9 @@ Vector3 Vector3::operator/(float scalar) const {
     return Vector3(X / scalar, Y / scalar, Z / scalar);
 }
 
-
 float Vector3::Length() const {
     return sqrtf(X * X + Y * Y + Z * Z);
 }
-
 
 float* ViewMatrix::operator[](int index) {
     return matrix[index];
@@ -81,7 +78,6 @@ float* ViewMatrix::operator[](int index) {
 const float* ViewMatrix::operator[](int index) const {
     return matrix[index];
 }
-
 
 std::string read_str(uintptr_t address) {
     std::vector<char> buffer(256);
@@ -99,38 +95,30 @@ std::string read_str(uintptr_t address) {
     return std::string(buffer.data(), offset);
 }
 
-
 ViewMatrix get_view_matrix() {
     return memory::memRead<ViewMatrix>(memory::baseAddress + offsets::dwViewMatrix);
 }
-
 
 float get_distance(const Vector3& from, const Vector3& to) {
     return sqrt(pow(to.X - from.X, 2) + pow(to.Y - from.Y, 2) + pow(to.Z - from.Z, 2));
 }
 
-
 Vector3 WorldToScreen(const ViewMatrix& vm, const Vector3& pos) {
-    // Multiply the position by the view matrix
     float _x = vm[0][0] * pos.X + vm[0][1] * pos.Y + vm[0][2] * pos.Z + vm[0][3];
     float _y = vm[1][0] * pos.X + vm[1][1] * pos.Y + vm[1][2] * pos.Z + vm[1][3];
     float _w = vm[3][0] * pos.X + vm[3][1] * pos.Y + vm[3][2] * pos.Z + vm[3][3];
 
-    // Check if the point is behind the camera
-    if (_w < 0.01f) return Vector3(); // Return an empty Vector3 if behind camera
+    if (_w < 0.01f) return Vector3();
 
-    // Calculate the normalized device coordinates
-    float inv_w = 1.0f / _w; // Inverse of w for perspective division
-    _x *= inv_w; // Apply perspective divide
-    _y *= inv_w; // Apply perspective divide
+    float inv_w = 1.0f / _w;
+    _x *= inv_w;
+    _y *= inv_w;
 
-    // Get screen dimensions
     float screen_center_x = GetSystemMetrics(SM_CXSCREEN) * 0.5f;
     float screen_center_y = GetSystemMetrics(SM_CYSCREEN) * 0.5f;
 
-    // Convert normalized device coordinates to screen coordinates
-    float x = screen_center_x + _x * screen_center_x; // X coordinate
-    float y = screen_center_y - _y * screen_center_y; // Y coordinate (flipped)
+    float x = screen_center_x + _x * screen_center_x;
+    float y = screen_center_y - _y * screen_center_y;
 
-    return Vector3(x, y, _w); // Return screen coordinates with depth (w)
+    return Vector3(x, y, _w);
 }
