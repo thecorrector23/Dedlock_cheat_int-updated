@@ -3,7 +3,6 @@
 #include <iostream>
 
 namespace memory {
-
     uintptr_t baseAddress = 0;
     size_t moduleSize = 0;
     HANDLE processHandle = nullptr;
@@ -26,7 +25,6 @@ namespace memory {
                 }
             } while (Process32NextW(snapshotHandle, &processEntry));
         }
-
         CloseHandle(snapshotHandle);
         return NULL;
     }
@@ -51,7 +49,6 @@ namespace memory {
                 }
             } while (Module32NextW(snapshotHandle, &moduleEntry));
         }
-
         CloseHandle(snapshotHandle);
         return false;
     }
@@ -79,7 +76,6 @@ namespace memory {
             delete[] data;
             return NULL;
         }
-
         for (size_t i = 0; i <= bytesRead - patternBytes.size(); i++) {
             bool found = true;
             for (size_t j = 0; j < patternBytes.size(); j++) {
@@ -93,34 +89,27 @@ namespace memory {
                 return baseAddress + i;
             }
         }
-
         delete[] data;
         return NULL;
     }
 
-    // Новая функция записи в память с защитой
     bool memSafeWrite(uintptr_t address, const void* buffer, SIZE_T size) {
-        // Изменение защиты памяти
         DWORD oldProtect;
         if (!VirtualProtectEx(processHandle, (LPVOID)address, size, PAGE_EXECUTE_READWRITE, &oldProtect)) {
             std::cout << "Failed to change memory protection!" << std::endl;
             return false;
         }
 
-        // Запись в память
         SIZE_T written;
         if (!WriteProcessMemory(processHandle, (LPVOID)address, buffer, size, &written) || written != size) {
             std::cout << "Failed to write to memory!" << std::endl;
-            VirtualProtectEx(processHandle, (LPVOID)address, size, oldProtect, &oldProtect); // Восстановление защиты
+            VirtualProtectEx(processHandle, (LPVOID)address, size, oldProtect, &oldProtect);
             return false;
         }
-
-        // Восстановление старой защиты памяти
         if (!VirtualProtectEx(processHandle, (LPVOID)address, size, oldProtect, &oldProtect)) {
             std::cout << "Failed to restore memory protection!" << std::endl;
             return false;
         }
-
         return true;
     }
 
