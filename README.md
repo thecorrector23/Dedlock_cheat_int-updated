@@ -14,9 +14,6 @@ Fixed the names of the champions being returned as "Unknown"
 #
 All the code has been updated, if you get errors in VS let me know in my Discord
 
-Downloading from Github is causing weird errors in VS for some users, here's the download link of the source code
-[https://gofile.io/d/Z93HAY](https://gofile.io/d/RRZDMd)
-
 My discord: miguelribeirinho
 
 # I will continue to update the cheat and offsets almost every time a new update comes out
