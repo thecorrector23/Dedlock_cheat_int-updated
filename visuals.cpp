@@ -56,7 +56,7 @@ bool Visuals1::esp_health_enabled = true;
 bool Visuals1::show_health = true;
 bool Visuals1::show_max_health = true;
 bool Visuals1::esp_show_address = false;
-bool Visuals1::esp_show_name = false;
+bool Visuals1::esp_show_name = true;
 
 void Visuals1::UpdateEntityCache() {
     ULONG_PTR entity_list = get_entity_list();
