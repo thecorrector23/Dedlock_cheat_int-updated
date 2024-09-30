@@ -177,12 +177,12 @@ bool SniperAutoAim::is_target_in_cooldown(int target_index) {
 }
 
 void SniperAutoAim::RenderSniperSettingsMenu() {
-    if (ImGui::Checkbox("Enable Sniper AutoAim", &aim_active)) {
+    if (ImGui::Checkbox("Enable Sniper AutoAim", &SniperAutoAim::aim_active)) {
         ImGui::SetNextItemOpen(false);
     }
-    if (aim_active && ImGui::TreeNode("Sniper AutoAim Settings")) {
-        ImGui::SliderFloat("Search Radius", &search_radius, 100.0f, 5000.0f, "Radius: %100.0f");
-        ImGui::SliderFloat("HP Threshold", &hp_threshold, 1.0f, 5.0f, "HP: %1.0f");
+    if (SniperAutoAim::aim_active && ImGui::TreeNode("Sniper AutoAim Settings")) {
+        ImGui::SliderFloat("Search Radius", &SniperAutoAim::search_radius, 100.0f, 5000.0f, "Radius: %100.0f");
+        ImGui::SliderFloat("HP Threshold", &SniperAutoAim::hp_threshold, 1.0f, 5.0f, "HP: %1.0f");
         ImGui::TreePop();
     }
 }

@@ -1,27 +1,21 @@
-#pragma once
-#define WIN32_LEAN_AND_MEAN
+#include <iostream>
 #include <windows.h>
 #include "MinHook/MinHook.h"
-#if _WIN64 
-#pragma comment(lib, "MinHook/libMinHook.x64.lib")
-#else
-#pragma comment(lib, "MinHook/libMinHook.x86.lib")
-#endif
-
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <chrono>
-#include "visuals.h"  
+#include "visuals.h"
 #include "aimbot.h"
-#pragma comment(lib, "d3d11.lib")
 #include "beepbob.h"
-#include "movment.h" 
+#include "movment.h"
 #include "memory.h"
-#include <iostream>
-#include "sniper.h" 
+#include "sniper.h"
+#include "config.h"
 #include "freecam.h"
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "MinHook/libMinHook.x64.lib")
 
 HINSTANCE dll_handle;
 typedef long(__stdcall* present)(IDXGISwapChain*, UINT, UINT);
@@ -74,7 +68,7 @@ bool get_present_pointer() {
 WNDPROC oWndProc;
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
         return true;
 
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
@@ -114,11 +108,15 @@ void RenderMenu() {
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Movement")) {
-                render_movement_settings();
+                Movement::render_movement_settings();
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Extra")) {
                 freecam::RenderFreeCamMenu();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Config")) {
+                RenderConfigMenu();
                 ImGui::EndTabItem();
             }
             ImGui::EndTabBar();
@@ -149,12 +147,13 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
         else
             return p_present(p_swap_chain, sync_interval, flags);
     }
+
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-    
+
     RenderMenu();
-    process_movement_logic();
+    Movement::process_movement_logic();
 
     uintptr_t local_entity = find_local_player(local_team);
     ViewMatrix vm = get_view_matrix();
@@ -203,6 +202,13 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
     return p_present(p_swap_chain, sync_interval, flags);
 }
 
+void CreateConsole() {
+    AllocConsole();
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    std::cout << "Console initialized" << std::endl;
+}
+
 DWORD __stdcall EjectThread(LPVOID lpParameter) {
     Sleep(100);
     FreeLibraryAndExitThread(dll_handle, 0);
@@ -211,6 +217,8 @@ DWORD __stdcall EjectThread(LPVOID lpParameter) {
 }
 
 int WINAPI main() {
+    //CreateConsole(); just for debug
+
     const wchar_t* processName = L"project8.exe";
     const wchar_t* moduleName = L"client.dll";
 
@@ -252,9 +260,6 @@ int WINAPI main() {
 
     while (true) {
         Sleep(50);
-        if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
-
-        }
         if (GetAsyncKeyState(VK_DELETE)) {
             break;
         }
@@ -274,20 +279,17 @@ int WINAPI main() {
     if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
     if (p_context) { p_context->Release(); p_context = NULL; }
     if (p_device) { p_device->Release(); p_device = NULL; }
-    SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
-
+    SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)oWndProc);
     CloseHandle(memory::processHandle);
-    CreateThread(0, 0, EjectThread, 0, 0, 0);
 
     return 0;
 }
 
-BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
-    if (dwReason == DLL_PROCESS_ATTACH) {
-        dll_handle = hModule;
-        CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)main, NULL, 0, NULL);
-    }
-    else if (dwReason == DLL_PROCESS_DETACH) { //nothing at the moment
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
+    dll_handle = hModule;
+    if (ul_reason_for_call == DLL_PROCESS_ATTACH) {
+        DisableThreadLibraryCalls(hModule);
+        CreateThread(0, 0, (LPTHREAD_START_ROUTINE)main, 0, 0, 0);
     }
     return TRUE;
 }

@@ -104,14 +104,16 @@ std::string GetKeyName1(int key) {
     return "Unknown BeepBobCpp";
 }
 
-bool BebopHook::hook_active = false;
-int BebopHook::hook_speed = 2500;
-bool BebopHook::target_locked = false;
-int BebopHook::locked_target_index = -1;
-float BebopHook::aim_smoothness = 1.0f;
-bool BebopHook::enable_delay = false;
-std::chrono::steady_clock::time_point BebopHook::last_target_time = std::chrono::steady_clock::now();
-int hookActivationKey = 'F'; 
+namespace BebopHook {
+    bool BebopHook::hook_active = false;
+    int BebopHook::hook_speed = 2500;
+    bool BebopHook::target_locked = false;
+    int BebopHook::locked_target_index = -1;
+    float BebopHook::aim_smoothness = 1.0f;
+    bool BebopHook::enable_delay = false;
+    std::chrono::steady_clock::time_point BebopHook::last_target_time = std::chrono::steady_clock::now();
+    int hookActivationKey = 'F';
+}
 
 constexpr float PI = 3.14159f;
 

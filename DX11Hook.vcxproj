@@ -125,7 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\Users\asab\Desktop\DeadlockCheatSource\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\asab\Desktop\deadlockcheatsource2\nlohmann;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +144,7 @@
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>C:\Users\asab\Desktop\deadlockcheatsource2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="aimbot.cpp" />
     <ClCompile Include="beepbob.cpp" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="freecam.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -175,6 +177,7 @@
   <ItemGroup>
     <ClInclude Include="aimbot.h" />
     <ClInclude Include="beepbob.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="freecam.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -185,6 +188,7 @@
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="math.h" />
     <ClInclude Include="memory.h" />
     <ClInclude Include="MinHook\MinHook.h" />

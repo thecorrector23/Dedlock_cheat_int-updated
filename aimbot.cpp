@@ -7,9 +7,6 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include "aimbot.h"
-#include <map>
-#include <string>
 
 std::string Aimbot::GetKeyName(int key) {
     static std::map<int, std::string> keyNames = {
@@ -107,7 +104,6 @@ std::string Aimbot::GetKeyName(int key) {
     if (keyNames.find(key) != keyNames.end()) {
         return keyNames[key];
     }
-
     return "Unknown AimbotCpp";
 }
 

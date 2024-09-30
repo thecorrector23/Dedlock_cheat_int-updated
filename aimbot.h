@@ -6,7 +6,7 @@
 #include "visuals.h"
 #include <string>
 
-struct AimbotSettings { //default aimbot settings
+struct AimbotSettings {
     bool enabled = true;          
     bool targetLocked = false;      
     int lockedTargetIndex = -1;     

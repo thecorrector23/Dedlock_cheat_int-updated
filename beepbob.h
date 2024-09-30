@@ -7,13 +7,14 @@
 #include <chrono>
 
 namespace BebopHook {
-    extern bool hook_active;         
-    extern int hook_speed;          
-    extern bool target_locked;         
-    extern int locked_target_index;    
-    extern float aim_smoothness;       
-    extern bool enable_delay;          
-    extern std::chrono::steady_clock::time_point last_target_time; 
+    extern bool hook_active;
+    extern int hook_speed;
+    extern bool target_locked;
+    extern int locked_target_index;
+    extern float aim_smoothness;
+    extern bool enable_delay;
+    extern int hookActivationKey;
+    extern std::chrono::steady_clock::time_point last_target_time;
 
     void RenderBebopSettingsMenu();
     void BebopAutoHookLogic(uintptr_t local_entity, uint8_t local_team, Vector3 local_player_pos, ViewMatrix vm);
