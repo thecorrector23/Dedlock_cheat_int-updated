@@ -131,8 +131,8 @@ void ToggleMenuVisibility() {
 void RenderMenu() {
     ToggleMenuVisibility();
     if (show_menu) {
-        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver); // �O�ô��ڴ�С�� 800x600
-        ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);  // �O�ô���λ�Þ� (100, 100)
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver); // ФOЦГґ°їЪґуРЎћй 800x600
+        ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);  // ФOЦГґ°їЪО»ЦГћй (100, 100)
 
         ImGui::Begin("Deadlock Cheat");
         if (ImGui::BeginTabBar("##tabs")) {
@@ -310,26 +310,27 @@ int WINAPI main() {
         }
 
 
-    if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
-        return 1;
+        if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
+            return 1;
+        }
+        if (MH_Uninitialize() != MH_OK) {
+            return 1;
+        }
+
+        ImGui_ImplDX11_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+
+        if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
+        if (p_context) { p_context->Release(); p_context = NULL; }
+        if (p_device) { p_device->Release(); p_device = NULL; }
+        SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
+
+        CloseHandle(memory::processHandle);
+        CreateThread(0, 0, EjectThread, 0, 0, 0);
+
+        return 0;
     }
-    if (MH_Uninitialize() != MH_OK) {
-        return 1;
-    }
-
-    ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
-
-    if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
-    if (p_context) { p_context->Release(); p_context = NULL; }
-    if (p_device) { p_device->Release(); p_device = NULL; }
-    SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
-
-    CloseHandle(memory::processHandle);
-    CreateThread(0, 0, EjectThread, 0, 0, 0);
-
-    return 0;
 }
 
 BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
@@ -337,7 +338,8 @@ BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
         dll_handle = hModule;
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)main, NULL, 0, NULL);
     }
-    else if (dwReason == DLL_PROCESS_DETACH) { //nothing at the moment
+    else if (dwReason == DLL_PROCESS_DETACH) {
+
     }
     return TRUE;
 }

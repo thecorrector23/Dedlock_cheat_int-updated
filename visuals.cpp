@@ -1,4 +1,4 @@
-﻿#include "visuals.h"
+#include "visuals.h"
 #include <chrono>
 #include <vector>
 #include <sstream>
