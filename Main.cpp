@@ -119,8 +119,8 @@ ID3D11RenderTargetView* mainRenderTargetView = NULL;
 void ToggleMenuVisibility() {
     if (GetAsyncKeyState(VK_INSERT) & 0x1) {
         if (!insert_key_pressed) {
-            show_menu = !show_menu;
             insert_key_pressed = true;
+            show_menu = !show_menu;   
         }
     }
     else {
@@ -303,10 +303,7 @@ int WINAPI main() {
         if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
 
         }
-        if (GetAsyncKeyState(VK_DELETE)) {
-            break;
-        }
-    }
+
 
     if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
         return 1;
