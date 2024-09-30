@@ -131,6 +131,9 @@ void ToggleMenuVisibility() {
 void RenderMenu() {
     ToggleMenuVisibility();
     if (show_menu) {
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver); // 設置窗口大小為 800x600
+        ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);  // 設置窗口位置為 (100, 100)
+
         ImGui::Begin("Deadlock Cheat");
         if (ImGui::BeginTabBar("##tabs")) {
             if (ImGui::BeginTabItem("Aimbot")) {
