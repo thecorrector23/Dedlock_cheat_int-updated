@@ -1,4 +1,4 @@
-#New updates
+# New updates
 
 You can close/open the menu with INSERT
 
