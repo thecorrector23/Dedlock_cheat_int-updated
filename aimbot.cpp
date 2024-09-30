@@ -323,6 +323,8 @@ void Aimbot::RenderAimbotSettingsMenu() {
     if (ImGui::Checkbox("Enable Aimbot", &settings.enabled)) {
         ImGui::SetNextItemOpen(false);
     }
+
+    ImGui::SetNextItemOpen(true, ImGuiCond_Once);
     if (settings.enabled && ImGui::TreeNode("Aimbot Settings")) {
         ImGui::SliderFloat("Aimbot FOV", &settings.fov, 5.0f, 180.0f, "FOV: %.1f");
         ImGui::SliderFloat("Aimbot Smoothness", &settings.smoothness, 1.0f, 10.0f, "Smoothness: %.1f");

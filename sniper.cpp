@@ -2,7 +2,7 @@
 
 bool SniperAutoAim::aim_active = false;
 float SniperAutoAim::search_radius = 3000.0f;
-float SniperAutoAim::hp_threshold = 1.0f;
+float SniperAutoAim::hp_threshold = 2.0f;
 std::chrono::steady_clock::time_point SniperAutoAim::last_shot_time = std::chrono::steady_clock::now();
 std::map<int, std::chrono::steady_clock::time_point> SniperAutoAim::target_cooldowns;
 

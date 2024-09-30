@@ -23,6 +23,8 @@
 #include "sniper.h" 
 #include "freecam.h"
 
+#include <chrono>
+
 HINSTANCE dll_handle;
 typedef long(__stdcall* present)(IDXGISwapChain*, UINT, UINT);
 present p_present;
@@ -33,6 +35,34 @@ bool aimbot_active = false;
 
 static bool show_menu = true;
 static bool insert_key_pressed = false;
+
+int soulsAimKey = VK_OEM_3;
+bool soulAimKeyPressed = false;
+
+bool showSoulAimText = false;
+std::chrono::time_point<std::chrono::steady_clock> soulAimTextStartTime;
+
+void UpdateSoulAimKeyState() {
+    if (GetAsyncKeyState(soulsAimKey) & 0x8000) {
+        if (!soulAimKeyPressed) {
+            soulAimKeyPressed = true;
+            Aimbot::settings.soulsAim = !Aimbot::settings.soulsAim;
+            showSoulAimText = true;
+            soulAimTextStartTime = std::chrono::steady_clock::now();
+        }
+    }
+    else {
+        soulAimKeyPressed = false;
+    }
+
+    if (showSoulAimText) {
+        auto now = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - soulAimTextStartTime).count();
+        if (duration >= 2) {
+            showSoulAimText = false;
+        }
+    }
+}
 
 bool get_present_pointer() {
     DXGI_SWAP_CHAIN_DESC sd;
@@ -89,8 +119,8 @@ ID3D11RenderTargetView* mainRenderTargetView = NULL;
 void ToggleMenuVisibility() {
     if (GetAsyncKeyState(VK_INSERT) & 0x1) {
         if (!insert_key_pressed) {
-            show_menu = !show_menu;
             insert_key_pressed = true;
+            show_menu = !show_menu;   
         }
     }
     else {
@@ -101,18 +131,23 @@ void ToggleMenuVisibility() {
 void RenderMenu() {
     ToggleMenuVisibility();
     if (show_menu) {
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver); // ФOЦГґ°їЪґуРЎћй 800x600
+        ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);  // ФOЦГґ°їЪО»ЦГћй (100, 100)
+
         ImGui::Begin("Deadlock Cheat");
         if (ImGui::BeginTabBar("##tabs")) {
-            if (ImGui::BeginTabItem("Render")) {
-                Visuals1::RenderSettingsMenu();
-                ImGui::EndTabItem();
-            }
             if (ImGui::BeginTabItem("Aimbot")) {
                 Aimbot::RenderAimbotSettingsMenu();
                 BebopHook::RenderBebopSettingsMenu();
                 SniperAutoAim::RenderSniperSettingsMenu();
                 ImGui::EndTabItem();
             }
+
+            if (ImGui::BeginTabItem("Render")) {
+                Visuals1::RenderSettingsMenu();
+                ImGui::EndTabItem();
+            }
+            
             if (ImGui::BeginTabItem("Movement")) {
                 render_movement_settings();
                 ImGui::EndTabItem();
@@ -123,6 +158,21 @@ void RenderMenu() {
             }
             ImGui::EndTabBar();
         }
+        ImGui::End();
+    }
+
+    // show a text message in the top left corner of the screen to indicate the state of soulsAim
+        // the text auto disappears after 2 seconds
+        // red color if soulsAim is disabled, green if enabled
+    if (showSoulAimText) {
+        ImGuiIO& io = ImGui::GetIO();
+        ImVec2 displaySize = io.DisplaySize;
+        ImVec2 windowPos = ImVec2(displaySize.x / 2 - 140, displaySize.y / 2 - 100); // Set the window position to the center of the screen with a slight offset on the y-axis
+        ImGui::SetNextWindowPos(windowPos);
+        ImGui::SetNextWindowBgAlpha(0.35f);
+        ImGui::Begin("SoulsAimStatus", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::SetWindowFontScale(2.0f); // Increase the font scale
+        ImGui::TextColored(Aimbot::settings.soulsAim ? ImVec4(0, 1, 0, 1) : ImVec4(1, 0, 0, 1), "Soul Aim : %s", Aimbot::settings.soulsAim ? "Enabled" : "Disabled");
         ImGui::End();
     }
 }
@@ -252,13 +302,14 @@ int WINAPI main() {
 
     while (true) {
         Sleep(50);
+
+        UpdateSoulAimKeyState();
+
         if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
 
         }
-        if (GetAsyncKeyState(VK_DELETE)) {
-            break;
-        }
     }
+
 
     if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
         return 1;
@@ -287,7 +338,8 @@ BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
         dll_handle = hModule;
         CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)main, NULL, 0, NULL);
     }
-    else if (dwReason == DLL_PROCESS_DETACH) { //nothing at the moment
+    else if (dwReason == DLL_PROCESS_DETACH) {
+
     }
     return TRUE;
 }

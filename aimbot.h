@@ -7,15 +7,15 @@
 #include <string>
 
 struct AimbotSettings { //default aimbot settings
-    bool enabled = true;          
-    bool targetLocked = false;      
-    int lockedTargetIndex = -1;     
-    float fov = 12.0f;             
-    float smoothness = 1.0f;        
-    bool active = false;            
+    bool enabled = true;
+    bool targetLocked = false;
+    int lockedTargetIndex = -1;
+    float fov = 28.0f;
+    float smoothness = 2.3f;
+    bool active = false;
     int activationKey = VK_XBUTTON1;
-    float maxDistance = 3200.0f;   
-    bool soulsAim = false;          
+    float maxDistance = 3200.0f;
+    bool soulsAim = true;
 };
 
 namespace Aimbot {

@@ -1,4 +1,4 @@
-﻿#include "visuals.h"
+#include "visuals.h"
 #include <chrono>
 #include <vector>
 #include <sstream>
@@ -47,7 +47,7 @@ float Visuals1::boxThickness = 1.0f;
 float Visuals1::lineThickness = 1.0f;
 ImVec4 Visuals1::boxColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 ImVec4 Visuals1::lineColor = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-bool Visuals1::esp_show_head = false;
+bool Visuals1::esp_show_head = true;
 bool Visuals1::esp_show_circle = false;
 float Visuals1::esp_distance_radius = 2400.0f;
 bool Visuals1::esp_box_enabled = true;
@@ -56,7 +56,7 @@ bool Visuals1::esp_health_enabled = true;
 bool Visuals1::show_health = true;
 bool Visuals1::show_max_health = true;
 bool Visuals1::esp_show_address = false;
-bool Visuals1::esp_show_name = false;
+bool Visuals1::esp_show_name = true;
 
 void Visuals1::UpdateEntityCache() {
     ULONG_PTR entity_list = get_entity_list();

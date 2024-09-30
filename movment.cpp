@@ -5,7 +5,7 @@
 
 bool shift_held = false, ctrl_held = false, space_pressed = false, script_enabled = true;
 auto shift_press_time = std::chrono::steady_clock::now();
-int delay_before_space = 300, delay_before_ctrl = 1000, initial_shift_delay = 250;
+int delay_before_space = 400, delay_before_ctrl = 1000, initial_shift_delay = 250;
 int min_delay = 100, max_delay = 2000;
 
 void process_movement_logic() {

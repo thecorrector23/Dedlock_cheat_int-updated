@@ -111,7 +111,7 @@ int BebopHook::locked_target_index = -1;
 float BebopHook::aim_smoothness = 1.0f;
 bool BebopHook::enable_delay = false;
 std::chrono::steady_clock::time_point BebopHook::last_target_time = std::chrono::steady_clock::now();
-int hookActivationKey = 'F'; 
+int hookActivationKey = VK_XBUTTON2;
 
 constexpr float PI = 3.14159f;
 
