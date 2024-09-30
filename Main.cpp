@@ -23,6 +23,8 @@
 #include "sniper.h" 
 #include "freecam.h"
 
+#include <chrono>
+
 HINSTANCE dll_handle;
 typedef long(__stdcall* present)(IDXGISwapChain*, UINT, UINT);
 present p_present;
@@ -33,6 +35,34 @@ bool aimbot_active = false;
 
 static bool show_menu = true;
 static bool insert_key_pressed = false;
+
+int soulsAimKey = VK_OEM_3;
+bool soulAimKeyPressed = false;
+
+bool showSoulAimText = false;
+std::chrono::time_point<std::chrono::steady_clock> soulAimTextStartTime;
+
+void UpdateSoulAimKeyState() {
+    if (GetAsyncKeyState(soulsAimKey) & 0x8000) {
+        if (!soulAimKeyPressed) {
+            soulAimKeyPressed = true;
+            Aimbot::settings.soulsAim = !Aimbot::settings.soulsAim;
+            showSoulAimText = true;
+            soulAimTextStartTime = std::chrono::steady_clock::now();
+        }
+    }
+    else {
+        soulAimKeyPressed = false;
+    }
+
+    if (showSoulAimText) {
+        auto now = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - soulAimTextStartTime).count();
+        if (duration >= 2) {
+            showSoulAimText = false;
+        }
+    }
+}
 
 bool get_present_pointer() {
     DXGI_SWAP_CHAIN_DESC sd;
@@ -123,6 +153,21 @@ void RenderMenu() {
             }
             ImGui::EndTabBar();
         }
+        ImGui::End();
+    }
+
+    // show a text message in the top left corner of the screen to indicate the state of soulsAim
+        // the text auto disappears after 2 seconds
+        // red color if soulsAim is disabled, green if enabled
+    if (showSoulAimText) {
+        ImGuiIO& io = ImGui::GetIO();
+        ImVec2 displaySize = io.DisplaySize;
+        ImVec2 windowPos = ImVec2(displaySize.x / 2 - 140, displaySize.y / 2 - 100); // Set the window position to the center of the screen with a slight offset on the y-axis
+        ImGui::SetNextWindowPos(windowPos);
+        ImGui::SetNextWindowBgAlpha(0.35f);
+        ImGui::Begin("SoulsAimStatus", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::SetWindowFontScale(2.0f); // Increase the font scale
+        ImGui::TextColored(Aimbot::settings.soulsAim ? ImVec4(0, 1, 0, 1) : ImVec4(1, 0, 0, 1), "Soul Aim : %s", Aimbot::settings.soulsAim ? "Enabled" : "Disabled");
         ImGui::End();
     }
 }
@@ -252,6 +297,9 @@ int WINAPI main() {
 
     while (true) {
         Sleep(50);
+
+        UpdateSoulAimKeyState();
+
         if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
 
         }
