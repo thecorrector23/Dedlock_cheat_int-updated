@@ -1,3 +1,10 @@
+New updates:
+You can close/open the menu with INSERT
+Changed back to the default theme of the imgui
+General optimization/fixes in the code
+Render tab is active again
+Fixed the names of the champions being returned as "Unknown"
+
 All the code has been updated, if you get errors in VS let me know in my Discord
 
 Downloading from Github is causing weird errors in VS for some users, here's the download link of the source code
