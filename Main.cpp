@@ -308,29 +308,29 @@ int WINAPI main() {
         if (GetAsyncKeyState(VK_NUMPAD0) & 1) {
 
         }
-
-
-        if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
-            return 1;
-        }
-        if (MH_Uninitialize() != MH_OK) {
-            return 1;
-        }
-
-        ImGui_ImplDX11_Shutdown();
-        ImGui_ImplWin32_Shutdown();
-        ImGui::DestroyContext();
-
-        if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
-        if (p_context) { p_context->Release(); p_context = NULL; }
-        if (p_device) { p_device->Release(); p_device = NULL; }
-        SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
-
-        CloseHandle(memory::processHandle);
-        CreateThread(0, 0, EjectThread, 0, 0, 0);
-
-        return 0;
     }
+
+
+    if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK) {
+        return 1;
+    }
+    if (MH_Uninitialize() != MH_OK) {
+        return 1;
+    }
+
+    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
+    if (mainRenderTargetView) { mainRenderTargetView->Release(); mainRenderTargetView = NULL; }
+    if (p_context) { p_context->Release(); p_context = NULL; }
+    if (p_device) { p_device->Release(); p_device = NULL; }
+    SetWindowLongPtr(window, GWLP_WNDPROC, (LONG_PTR)(oWndProc));
+
+    CloseHandle(memory::processHandle);
+    CreateThread(0, 0, EjectThread, 0, 0, 0);
+
+    return 0;
 }
 
 BOOL __stdcall DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved) {
