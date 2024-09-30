@@ -1,4 +1,4 @@
-#include "visuals.h"
+﻿#include "visuals.h"
 #include <chrono>
 #include <vector>
 #include <sstream>
@@ -80,14 +80,15 @@ void Visuals1::UpdateEntityCache() {
         ss << "0x" << std::hex << std::uppercase << entity;
         cache.entityAddressStr = ss.str();
 
-        uintptr_t name_ptr = memory::memRead<uintptr_t>(entity + 0x840);
+        //offsets of champ names
+        uintptr_t name_ptr = memory::memRead<uintptr_t>(entity + 0x328);
         if (name_ptr) {
-            std::string model_path = read_str_from_memory(name_ptr + 0x830);
+            std::string model_path = read_str_from_memory(name_ptr + 0x248);
             cache.entityName = get_entity_human_name(model_path);
             cache.headBoneIndex = get_bone_head_index(cache.entityName);
         }
         else {
-            cache.entityName = "Unknown";
+            cache.entityName = "Unknown TestVisualsCpp";
             cache.headBoneIndex = -1;
         }
 

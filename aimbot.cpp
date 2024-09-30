@@ -108,7 +108,7 @@ std::string Aimbot::GetKeyName(int key) {
         return keyNames[key];
     }
 
-    return "Unknown";
+    return "Unknown AimbotCpp";
 }
 
 AimbotSettings Aimbot::settings;

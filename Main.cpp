@@ -12,6 +12,7 @@
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include <d3d11.h>
+#include <chrono>
 #include "visuals.h"  
 #include "aimbot.h"
 #pragma comment(lib, "d3d11.lib")
@@ -29,6 +30,9 @@ present p_present_target;
 
 uint8_t local_team = 0;
 bool aimbot_active = false;
+
+static bool show_menu = true;
+static bool insert_key_pressed = false;
 
 bool get_present_pointer() {
     DXGI_SWAP_CHAIN_DESC sd;
@@ -82,30 +86,45 @@ ID3D11Device* p_device = NULL;
 ID3D11DeviceContext* p_context = NULL;
 ID3D11RenderTargetView* mainRenderTargetView = NULL;
 
-void RenderMenu() {
-    ImGui::Begin("Deadlock Cheat");
-    if (ImGui::BeginTabBar("##tabs")) {
-        if (ImGui::BeginTabItem("Render")) {
-            Visuals1::RenderSettingsMenu();
-            ImGui::EndTabItem();
+void ToggleMenuVisibility() {
+    if (GetAsyncKeyState(VK_INSERT) & 0x1) {
+        if (!insert_key_pressed) {
+            show_menu = !show_menu;
+            insert_key_pressed = true;
         }
-        if (ImGui::BeginTabItem("Aimbot")) {
-            Aimbot::RenderAimbotSettingsMenu();
-            BebopHook::RenderBebopSettingsMenu();
-            SniperAutoAim::RenderSniperSettingsMenu();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Movement")) {
-            render_movement_settings();  
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Extra")) {
-            freecam::RenderFreeCamMenu();
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
     }
-    ImGui::End();
+    else {
+        insert_key_pressed = false;
+    }
+}
+
+void RenderMenu() {
+    ToggleMenuVisibility();
+    if (show_menu) {
+        ImGui::Begin("Deadlock Cheat");
+        if (ImGui::BeginTabBar("##tabs")) {
+            if (ImGui::BeginTabItem("Render")) {
+                Visuals1::RenderSettingsMenu();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Aimbot")) {
+                Aimbot::RenderAimbotSettingsMenu();
+                BebopHook::RenderBebopSettingsMenu();
+                SniperAutoAim::RenderSniperSettingsMenu();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Movement")) {
+                render_movement_settings();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Extra")) {
+                freecam::RenderFreeCamMenu();
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
+        ImGui::End();
+    }
 }
 
 static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_interval, UINT flags) {
@@ -133,15 +152,15 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
-
-    RenderMenu(); 
-    process_movement_logic(); 
+    
+    RenderMenu();
+    process_movement_logic();
 
     uintptr_t local_entity = find_local_player(local_team);
-    ViewMatrix vm = get_view_matrix();  
+    ViewMatrix vm = get_view_matrix();
 
     uintptr_t cammanagerAddress = memory::memRead<uintptr_t>(memory::baseAddress + (offsets::CCitadelCameraManager + 0x28));
-    Vector3 cammanager_pos = memory::memRead<Vector3>(cammanagerAddress+0x38);
+    Vector3 cammanager_pos = memory::memRead<Vector3>(cammanagerAddress + 0x38);
 
     ViewMatrix view_matrix = memory::memRead<ViewMatrix>(memory::baseAddress + offsets::dwViewMatrix);
 
@@ -155,8 +174,8 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
 
     freecam::NavigateEnemies(local_team);
     freecam::UpdateCameraPosition();
-    
-    if (Aimbot::settings.enabled) {  
+
+    if (Aimbot::settings.enabled) {
         if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
             Aimbot::settings.active = true;
         }
@@ -164,7 +183,7 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
             Aimbot::settings.active = false;
             Aimbot::settings.targetLocked = false;
         }
-        Aimbot::AimbotLogic(local_entity, local_team, cammanager_pos, vm);  
+        Aimbot::AimbotLogic(local_entity, local_team, cammanager_pos, vm);
         Aimbot::DrawFOVCircle(Aimbot::settings.fov);
     }
 
@@ -172,7 +191,7 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
         BebopHook::BebopAutoHookLogic(local_entity, local_team, cammanager_pos, vm);
     }
     if (SniperAutoAim::aim_active) {
-        SniperAutoAim::SniperAutoAimLogic(local_entity, local_team, cammanager_pos, vm);  
+        SniperAutoAim::SniperAutoAimLogic(local_entity, local_team, cammanager_pos, vm);
     }
 
     ImGui::EndFrame();
@@ -214,7 +233,6 @@ int WINAPI main() {
     }
 
     offsets::initializeOffsets();
-
     Visuals1::UpdateEntityCache();
 
     if (!get_present_pointer()) {

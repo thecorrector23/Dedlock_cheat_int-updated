@@ -101,7 +101,7 @@ std::string GetKeyName1(int key) {
     if (keyNames.find(key) != keyNames.end()) {
         return keyNames[key];
     }
-    return "Unknown";
+    return "Unknown BeepBobCpp";
 }
 
 bool BebopHook::hook_active = false;

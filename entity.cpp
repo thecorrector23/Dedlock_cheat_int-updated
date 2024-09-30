@@ -93,7 +93,7 @@ std::vector<Vector3> get_bone_positions(uintptr_t entity) {
 
 std::string get_entity_human_name(const std::string& model_path) {
     auto it = model_to_name_map.find(model_path);
-    return (it != model_to_name_map.end()) ? it->second : "Unknown";
+    return (it != model_to_name_map.end()) ? it->second : "Unknown TestEntityCpp";
 }
 
 ULONG_PTR get_entity_list() {
@@ -128,7 +128,7 @@ std::string get_schema_name(const uintptr_t& entity) {
 
 std::string get_designer_name(const uintptr_t& entity) {
     const uintptr_t entity_identity = memory::memRead<uintptr_t>(entity + 0x10);
-    if (!entity_identity) return "";
+    if (!entity_identity) return "Not a player";
     const uintptr_t designer_name = memory::memRead<uintptr_t>(entity_identity + 0x20);
     return read_str(designer_name);
 }
