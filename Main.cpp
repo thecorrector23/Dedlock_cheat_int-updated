@@ -133,16 +133,18 @@ void RenderMenu() {
     if (show_menu) {
         ImGui::Begin("Deadlock Cheat");
         if (ImGui::BeginTabBar("##tabs")) {
-            if (ImGui::BeginTabItem("Render")) {
-                Visuals1::RenderSettingsMenu();
-                ImGui::EndTabItem();
-            }
             if (ImGui::BeginTabItem("Aimbot")) {
                 Aimbot::RenderAimbotSettingsMenu();
                 BebopHook::RenderBebopSettingsMenu();
                 SniperAutoAim::RenderSniperSettingsMenu();
                 ImGui::EndTabItem();
             }
+
+            if (ImGui::BeginTabItem("Render")) {
+                Visuals1::RenderSettingsMenu();
+                ImGui::EndTabItem();
+            }
+            
             if (ImGui::BeginTabItem("Movement")) {
                 render_movement_settings();
                 ImGui::EndTabItem();
