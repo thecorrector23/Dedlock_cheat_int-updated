@@ -323,14 +323,14 @@ void Aimbot::RenderAimbotSettingsMenu() {
         ImGui::SliderFloat("Aimbot FOV", &settings.fov, 5.0f, 180.0f, "FOV: %.1f");
         ImGui::SliderFloat("Aimbot Smoothness", &settings.smoothness, 1.0f, 10.0f, "Smoothness: %.1f");
         ImGui::SliderFloat("Max Aim Distance", &settings.maxDistance, 100.0f, 5000.0f, "Max Distance: %.1f");
-        ImGui::Checkbox("Souls Aim", &settings.soulsAim);
-        ImGui::Text("Activation Key:");
+        ImGui::Checkbox("Souls Aimbot", &settings.soulsAim);
+        ImGui::Text("Aimbot Key:");
         ImGui::SameLine();
         if (ImGui::Button("Choose Key")) {
             ImGui::OpenPopup("key_popup");
         }
         if (ImGui::BeginPopup("key_popup")) {
-            ImGui::Text("Press any key to set it as the activation key");
+            ImGui::Text("Press any key to set it as the aimbot key");
             for (int i = 0; i < 256; ++i) {
                 if (GetAsyncKeyState(i) & 0x8000) {
                     settings.activationKey = i;
@@ -340,7 +340,7 @@ void Aimbot::RenderAimbotSettingsMenu() {
             ImGui::EndPopup();
         }
         std::string keyName = GetKeyName(settings.activationKey);
-        ImGui::Text("Current Activation Key: %s", keyName.c_str());
+        ImGui::Text("Current Aimbot Key: %s", keyName.c_str());
         ImGui::TreePop();
     }
 }

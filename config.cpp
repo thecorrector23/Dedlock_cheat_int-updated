@@ -15,7 +15,6 @@ Config config;
 void LoadConfig() {
     std::ifstream inputFile("config.json");
     if (!inputFile.is_open()) {
-        //std::cout << "Failed to open config.json for reading.\n";
         return;
     }
 
@@ -69,8 +68,6 @@ void LoadConfig() {
     SniperAutoAim::aim_active = j["sniper"]["aim_active"].get<bool>();
     SniperAutoAim::search_radius = j["sniper"]["search_radius"].get<float>();
     SniperAutoAim::hp_threshold = j["sniper"]["hp_threshold"].get<float>();
-
-    //std::cout << "Loaded config settings from config.json.\n";
 }
 
 void SaveConfig() {
@@ -115,14 +112,11 @@ void SaveConfig() {
 
     std::ofstream outputFile("config.json");
     if (!outputFile.is_open()) {
-        //std::cout << "Failed to open config.json for writing.\n";
         return;
     }
 
     outputFile << j.dump(4);
     outputFile.close();
-
-    //std::cout << "Saved config settings to config.json.\n";
 }
 
 void RenderConfigMenu() {
@@ -133,6 +127,6 @@ void RenderConfigMenu() {
     if (ImGui::Button("Save Config")) {
         SaveConfig();
     }
-    ImGui::Text("The config.json is in the game folder");
+    ImGui::Text("The config.json is stored in the game folder");
     ImGui::Text("...\\SteamLibrary\\steamapps\\common\\Deadlock\\game\\bin\\win64");
 }

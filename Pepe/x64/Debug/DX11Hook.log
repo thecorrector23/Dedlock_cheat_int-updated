@@ -1,0 +1,61 @@
+﻿  aimbot.cpp
+  beepbob.cpp
+  config.cpp
+  dumper.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xutility(4706,18): warning C4244: '=': conversion from 'const wchar_t' to 'char', possible loss of data
+  (compiling source file 'dumper.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xutility(4706,18):
+      the template instantiation context (the oldest one first) is
+          C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(51,27):
+          see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_const_iterator<std::_String_val<std::_Simple_types<_Elem>>>,0>(_Iter,_Iter,const _Alloc &)' being compiled
+          with
+          [
+              _Elem=wchar_t,
+              _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
+              _Alloc=std::allocator<char>
+          ]
+              C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(51,9):
+              see the first reference to 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string' in 'dumper::wstringToString'
+          C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xstring(793,17):
+          see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct_from_iter<const wchar_t*,const wchar_t*,_Size_type>(_Iter,const _Sent,_Size)' being compiled
+          with
+          [
+              _Size_type=unsigned __int64,
+              _Iter=const wchar_t *,
+              _Sent=const wchar_t *,
+              _Size=unsigned __int64
+          ]
+          C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xstring(949,18):
+          see reference to function template instantiation '_OutIt *std::_Copy_n_unchecked4<const wchar_t*,_Size,char*>(_InIt,_SizeTy,_OutIt)' being compiled
+          with
+          [
+              _OutIt=char *,
+              _Size=unsigned __int64,
+              _InIt=const wchar_t *,
+              _SizeTy=unsigned __int64
+          ]
+  
+  entity.cpp
+  freecam.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  Main.cpp
+  math.cpp
+C:\Users\asab\Desktop\deadlockcheatsource2\math.cpp(103,16): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  memory.cpp
+  movment.cpp
+  offsets.cpp
+  sniper.cpp
+  visuals.cpp
+  Generating Code...
+  libMinHook.x64.lib(hook.obj) : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+MSVCRTD.lib(initializers.obj) : warning LNK4098: defaultlib 'libcmt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  Finished generating code
+  DX11Hook.vcxproj -> C:\Users\asab\Desktop\deadlockcheatsource2\x64\Debug\Pepe.dll

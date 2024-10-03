@@ -157,6 +157,7 @@
     <ClCompile Include="aimbot.cpp" />
     <ClCompile Include="beepbob.cpp" />
     <ClCompile Include="config.cpp" />
+    <ClCompile Include="dumper.cpp" />
     <ClCompile Include="entity.cpp" />
     <ClCompile Include="freecam.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="aimbot.h" />
     <ClInclude Include="beepbob.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="dumper.h" />
     <ClInclude Include="entity.h" />
     <ClInclude Include="freecam.h" />
     <ClInclude Include="ImGui\imconfig.h" />

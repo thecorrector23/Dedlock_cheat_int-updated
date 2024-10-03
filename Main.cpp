@@ -14,6 +14,7 @@
 #include "sniper.h"
 #include "config.h"
 #include "freecam.h"
+#include "dumper.h"
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "MinHook/libMinHook.x64.lib")
 
@@ -113,6 +114,7 @@ void RenderMenu() {
             }
             if (ImGui::BeginTabItem("Extra")) {
                 freecam::RenderFreeCamMenu();
+                dumper::RenderDumpMenu();
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Config")) {
@@ -202,12 +204,13 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
     return p_present(p_swap_chain, sync_interval, flags);
 }
 
+/*
 void CreateConsole() {
     AllocConsole();
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout);
-    std::cout << "Console initialized" << std::endl;
 }
+*/
 
 DWORD __stdcall EjectThread(LPVOID lpParameter) {
     Sleep(100);
@@ -224,18 +227,18 @@ int WINAPI main() {
 
     DWORD processId = memory::GetProcess(processName);
     if (!processId) {
-        std::wcerr << L"L 200: " << processName << std::endl;
+        //std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to find process " << processName << std::endl;
         return 1;
     }
 
     memory::processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, processId);
     if (!memory::processHandle) {
-        std::cerr << "L 206." << std::endl;
+        //std::cerr << "Error (Code: " << GetLastError() << "): Unable to open process." << std::endl;
         return 1;
     }
 
     if (!memory::GetModuleInfo(processId, moduleName)) {
-        std::wcerr << L"L212: " << moduleName << std::endl;
+        //std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to retrieve module info for " << moduleName << std::endl;
         CloseHandle(memory::processHandle);
         return 1;
     }
