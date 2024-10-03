@@ -2,13 +2,11 @@
 
 You can close/open the menu with INSERT
 
-Changed back to the default theme of the imgui
+Added a function to dump the current offsets and it will give a .txt in the Desktop with them
 
 General optimization/fixes in the code
 
-Render tab is active again
-
-Config system
+Config system, can load and save config
 
 Fixed the names of the champions being returned as "Unknown"
 #
