@@ -1,16 +1,13 @@
 # New updates
 
-You can close/open the menu with INSERT
+Added a function to dump the current offsets and it will give a .txt in the Desktop with them
 
-Changed back to the default theme of the imgui
+You can close/open the menu with INSERT
 
 General optimization/fixes in the code
 
-Render tab is active again
+Can save and load config
 
-Config system
-
-Fixed the names of the champions being returned as "Unknown"
 #
 All the code has been updated, if you get errors in VS let me know in my Discord
 
