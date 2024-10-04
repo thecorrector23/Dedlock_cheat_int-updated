@@ -8,6 +8,8 @@ General optimization/fixes in the code
 
 Config system, can load and save config
 
+Auto Offset updater
+
 Fixed the names of the champions being returned as "Unknown"
 #
 All the code has been updated, if you get errors in VS let me know in my Discord
