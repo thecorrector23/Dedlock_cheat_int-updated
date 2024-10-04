@@ -114,7 +114,6 @@ void RenderMenu() {
             }
             if (ImGui::BeginTabItem("Extra")) {
                 freecam::RenderFreeCamMenu();
-                dumper::RenderDumpMenu();
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem("Config")) {
@@ -204,13 +203,11 @@ static long __stdcall detour_present(IDXGISwapChain* p_swap_chain, UINT sync_int
     return p_present(p_swap_chain, sync_interval, flags);
 }
 
-/*
 void CreateConsole() {
     AllocConsole();
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout);
 }
-*/
 
 DWORD __stdcall EjectThread(LPVOID lpParameter) {
     Sleep(100);
@@ -220,29 +217,30 @@ DWORD __stdcall EjectThread(LPVOID lpParameter) {
 }
 
 int WINAPI main() {
-    //CreateConsole(); just for debug
+    CreateConsole(); //just for debug
 
     const wchar_t* processName = L"project8.exe";
     const wchar_t* moduleName = L"client.dll";
 
     DWORD processId = memory::GetProcess(processName);
     if (!processId) {
-        //std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to find process " << processName << std::endl;
+        std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to find process " << processName << std::endl;
         return 1;
     }
 
     memory::processHandle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, FALSE, processId);
     if (!memory::processHandle) {
-        //std::cerr << "Error (Code: " << GetLastError() << "): Unable to open process." << std::endl;
+        std::cerr << "Error (Code: " << GetLastError() << "): Unable to open process." << std::endl;
         return 1;
     }
 
     if (!memory::GetModuleInfo(processId, moduleName)) {
-        //std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to retrieve module info for " << moduleName << std::endl;
+        std::wcerr << L"Error (Code: " << GetLastError() << "): Unable to retrieve module info for " << moduleName << std::endl;
         CloseHandle(memory::processHandle);
         return 1;
     }
 
+    dumper::DumpOffsets();
     offsets::initializeOffsets();
     Visuals1::UpdateEntityCache();
 

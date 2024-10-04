@@ -1,12 +1,10 @@
-﻿  aimbot.cpp
-  beepbob.cpp
-  config.cpp
+﻿  Main.cpp
   dumper.cpp
 C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xutility(4706,18): warning C4244: '=': conversion from 'const wchar_t' to 'char', possible loss of data
   (compiling source file 'dumper.cpp')
       C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xutility(4706,18):
       the template instantiation context (the oldest one first) is
-          C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(51,27):
+          C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(57,27):
           see reference to function template instantiation 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string<std::_String_const_iterator<std::_String_val<std::_Simple_types<_Elem>>>,0>(_Iter,_Iter,const _Alloc &)' being compiled
           with
           [
@@ -14,7 +12,7 @@ C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\
               _Iter=std::_String_const_iterator<std::_String_val<std::_Simple_types<wchar_t>>>,
               _Alloc=std::allocator<char>
           ]
-              C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(51,9):
+              C:\Users\asab\Desktop\deadlockcheatsource2\dumper.cpp(57,9):
               see the first reference to 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>::basic_string' in 'dumper::wstringToString'
           C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\include\xstring(793,17):
           see reference to function template instantiation 'void std::basic_string<char,std::char_traits<char>,std::allocator<char>>::_Construct_from_iter<const wchar_t*,const wchar_t*,_Size_type>(_Iter,const _Sent,_Size)' being compiled
@@ -35,23 +33,7 @@ C:\Program Files\Microsoft Visual Studio\2022\Preview\VC\Tools\MSVC\14.42.34321\
               _SizeTy=unsigned __int64
           ]
   
-  entity.cpp
-  freecam.cpp
-  imgui.cpp
-  imgui_demo.cpp
-  imgui_draw.cpp
-  imgui_impl_dx11.cpp
-  imgui_impl_win32.cpp
-  imgui_tables.cpp
-  imgui_widgets.cpp
-  Main.cpp
-  math.cpp
-C:\Users\asab\Desktop\deadlockcheatsource2\math.cpp(103,16): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-  memory.cpp
-  movment.cpp
   offsets.cpp
-  sniper.cpp
-  visuals.cpp
   Generating Code...
   libMinHook.x64.lib(hook.obj) : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
 LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification

@@ -1,4 +1,5 @@
 #include "dumper.h"
+#include "offsets.h"
 #include <TlHelp32.h>
 #include <Psapi.h>
 #include <iostream>
@@ -8,6 +9,11 @@
 #include "ImGui/imgui.h"
 
 namespace dumper {
+    uintptr_t dumpedEntityList = 0;
+    uintptr_t dumpedLocalPlayer = 0;
+    uintptr_t dumpedCCameraManager = 0;
+    uintptr_t dumpedViewMatrix = 0;
+
     Signature::Signature(const std::string& pattern, int offset, int extra) : pattern(pattern), offset(offset), extra(extra) {}
 
     std::vector<uint8_t> Signature::parse_pattern() const {
@@ -26,9 +32,9 @@ namespace dumper {
         return bytes;
     }
 
-    void Signature::find(const std::vector<uint8_t>& memory, HANDLE processHandle, uintptr_t moduleBase, std::ofstream& outFile) const {
+    void Signature::find(const std::vector<uint8_t>& memory, HANDLE processHandle, uintptr_t moduleBase, uintptr_t& offsetVar) const {
         std::vector<uint8_t> pattern = parse_pattern();
-        for (size_t i = 0; i < memory.size(); ++i) {
+        for (size_t i = 0; i < memory.size() - pattern.size(); ++i) {
             bool patternMatch = true;
             for (size_t j = 0; j < pattern.size(); ++j) {
                 if (pattern[j] != 0 && memory[i + j] != pattern[j]) {
@@ -40,8 +46,8 @@ namespace dumper {
                 uintptr_t patternAddress = moduleBase + i;
                 int32_t of;
                 if (ReadProcessMemory(processHandle, reinterpret_cast<LPCVOID>(patternAddress + offset), &of, sizeof(of), nullptr)) {
-                    uintptr_t result = patternAddress + of + extra;
-                    outFile << "+ 0x" << std::hex << (result - moduleBase) << std::endl;
+                    offsetVar = patternAddress + of + extra;
+                    break;
                 }
             }
         }
@@ -69,7 +75,7 @@ namespace dumper {
         return nullptr;
     }
 
-        MODULEINFO getModuleInfo(HANDLE processHandle, const std::string& moduleName) {
+    MODULEINFO getModuleInfo(HANDLE processHandle, const std::string& moduleName) {
         HMODULE hMods[1024];
         DWORD cbNeeded;
         MODULEINFO modInfo = { 0 };
@@ -103,49 +109,68 @@ namespace dumper {
         std::string processName = "project8.exe";
         HANDLE processHandle = getProcessHandle(processName);
         if (!processHandle) {
-            //std::cerr << "Game process not found" << std::endl;
+            std::cerr << "Game process not found" << std::endl;
             return;
         }
 
         MODULEINFO moduleInfo = getModuleInfo(processHandle, "client.dll");
         if (!moduleInfo.lpBaseOfDll) {
-            //std::cerr << "client.dll not found" << std::endl;
+            std::cerr << "client.dll not found" << std::endl;
             CloseHandle(processHandle);
             return;
         }
 
-        std::vector<uint8_t> memory = readMemoryBytes(processHandle, reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll), moduleInfo.SizeOfImage);
+        uintptr_t moduleBase = reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll);
 
-        char desktopPath[MAX_PATH];
-        SHGetSpecialFolderPathA(nullptr, desktopPath, CSIDL_DESKTOP, FALSE);
+        std::vector<uint8_t> memory = readMemoryBytes(processHandle, moduleBase, moduleInfo.SizeOfImage);
 
-        std::ofstream outFile(std::string(desktopPath) + "\\DeadlockOffsets.txt");
-        if (!outFile.is_open()) {
-            //std::cerr << "Failed to create file on desktop" << std::endl;
-            CloseHandle(processHandle);
-            return;
-        }
+        localPlayerSig.find(memory, processHandle, moduleBase, dumpedLocalPlayer);
+        viewMatrixSig.find(memory, processHandle, moduleBase, dumpedViewMatrix);
+        entityListSig.find(memory, processHandle, moduleBase, dumpedEntityList);
+        CCameraManagerSig.find(memory, processHandle, moduleBase, dumpedCCameraManager);
 
-        outFile << "LocalPlayerController:" << std::endl;
-        localPlayerSig.find(memory, processHandle, reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll), outFile);
-        outFile << "ViewMatrix:" << std::endl;
-        viewMatrixSig.find(memory, processHandle, reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll), outFile);
-        outFile << "EntityList:" << std::endl;
-        entityListSig.find(memory, processHandle, reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll), outFile);
-        outFile << "CCameraManager:" << std::endl;
-        CCameraManagerSig.find(memory, processHandle, reinterpret_cast<uintptr_t>(moduleInfo.lpBaseOfDll), outFile);
-
-        outFile.close();
         CloseHandle(processHandle);
-    }
 
-    void RenderDumpMenu() {
-        ImGui::Separator();
-        ImGui::Text("Dump the current Offsets to your Desktop");
-        ImGui::Text("To update them, replace the old Offsets with the new ones in the offsets.cpp");
-        if (ImGui::Button("Dump Offsets")) {
-            DumpOffsets();
-            ImGui::Text("Offsets dumped to desktop");
+        dumpedEntityList -= moduleBase;
+        dumpedLocalPlayer -= moduleBase;
+        dumpedViewMatrix -= moduleBase;
+        dumpedCCameraManager -= moduleBase;
+
+        bool offsetsUpdated = false;
+
+        if (offsets::dwEntityList != dumpedEntityList) {
+            std::cout << "Updating dwEntityList from 0x" << std::hex << offsets::dwEntityList
+                << " to 0x" << dumpedEntityList << std::endl;
+            offsets::dwEntityList = dumpedEntityList;
+            offsetsUpdated = true;
+        }
+
+        if (offsets::dwLocalPlayer != dumpedLocalPlayer) {
+            std::cout << "Updating dwLocalPlayer from 0x" << std::hex << offsets::dwLocalPlayer
+                << " to 0x" << dumpedLocalPlayer << std::endl;
+            offsets::dwLocalPlayer = dumpedLocalPlayer;
+            offsetsUpdated = true;
+        }
+
+        if (offsets::dwViewMatrix != dumpedViewMatrix) {
+            std::cout << "Updating dwViewMatrix from 0x" << std::hex << offsets::dwViewMatrix
+                << " to 0x" << dumpedViewMatrix << std::endl;
+            offsets::dwViewMatrix = dumpedViewMatrix;
+            offsetsUpdated = true;
+        }
+
+        if (offsets::CCitadelCameraManager != dumpedCCameraManager) {
+            std::cout << "Updating CCitadelCameraManager from 0x" << std::hex << offsets::CCitadelCameraManager
+                << " to 0x" << dumpedCCameraManager << std::endl;
+            offsets::CCitadelCameraManager = dumpedCCameraManager;
+            offsetsUpdated = true;
+        }
+
+        if (offsetsUpdated) {
+            std::cout << "Offsets updated." << std::endl;
+        }
+        else {
+            std::cout << "Offsets are already updated." << std::endl;
         }
     }
 }

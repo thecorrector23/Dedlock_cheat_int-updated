@@ -25,7 +25,8 @@ static const std::unordered_map<std::string, std::string> model_to_name_map = {
     {"models/heroes_staging/warden/warden.vmdl", "WARDEN"},
     {"models/heroes_staging/wraith_gen_man/wraith_gen_man.vmdl", "WRAITH"},
     {"models/heroes_staging/yamato_v2/yamato.vmdl", "YAMATO"},
-    {"models/heroes_staging/mirage/mirage.vmdl", "MIRAGE"}
+    {"models/heroes_staging/mirage/mirage_gen_man.vmdl", "MIRAGE"},
+    {"models/heroes_staging/gen_man/gen_man.vmdl", "SANDBOX"}
 };
 
 static const std::unordered_map<std::string, int> model_to_head_bone_map = {
@@ -51,7 +52,7 @@ static const std::unordered_map<std::string, int> model_to_head_bone_map = {
     {"WRAITH", 7},
     {"YAMATO", 35},
     {"MIRAGE", 8},
-    {"models/heroes_staging/gen_man/gen_man.vmdl", 12}
+    {"SANDBOX", 12}
 };
 
 int get_bone_head_index(const std::string& model_path) {
